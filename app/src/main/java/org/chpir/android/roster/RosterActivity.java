@@ -29,11 +29,8 @@ public class RosterActivity extends Activity implements ScrollViewListener {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_roster);
-
-        final float scale = getResources().getDisplayMetrics().density;
-        HEIGHT = (int) (50 * scale + 0.5f);
-        WIDTH = (int) (150 * scale + 0.5f);
-        MARGIN = (int) (0.5 * scale + 0.5f);
+        setTitle(getIntent().getStringExtra("CenterName"));
+        setDimensions();
 
         headerScrollView = (OHScrollView) findViewById(R.id.header_scroll);
         contentScrollView = (OHScrollView) findViewById(R.id.content_scroll);
@@ -112,6 +109,13 @@ public class RosterActivity extends Activity implements ScrollViewListener {
             tl.addView(row);
         }
 
+    }
+
+    private void setDimensions() {
+        final float scale = getResources().getDisplayMetrics().density;
+        HEIGHT = (int) (50 * scale + 0.5f);
+        WIDTH = (int) (150 * scale + 0.5f);
+        MARGIN = (int) (0.5 * scale + 0.5f);
     }
 
     @Override
