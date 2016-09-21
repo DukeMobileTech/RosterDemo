@@ -28,12 +28,14 @@
                 android:layout_margin="1dp"
                 android:padding="2dp"
                 android:background="#ffcccccc"
+                android:textStyle="bold"
+                android:textSize="18sp"
                 android:text="Participant ID" />
 
         </LinearLayout>
 
-        <HorizontalScrollView
-            android:id="@+id/header_2"
+        <org.chpir.android.roster.OHScrollView
+            android:id="@+id/header_scroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1">
@@ -52,9 +54,13 @@
                         android:layout_height="50dp"
                         android:layout_width="150dp"
                         android:layout_weight="1"
-                        android:layout_margin="0.5dp"
+                        android:layout_margin="1dp"
                         android:padding="2dp"
                         android:background="@android:color/white"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
                         android:text="Gender" />
                     <TextView
                         android:textColor="@android:color/black"
@@ -62,9 +68,13 @@
                         android:layout_height="50dp"
                         android:layout_width="150dp"
                         android:layout_weight="1"
-                        android:layout_margin="0.5dp"
+                        android:layout_margin="1dp"
                         android:padding="2dp"
                         android:background="@android:color/white"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
                         android:text="Age" />
                     <TextView
                         android:textColor="@android:color/black"
@@ -72,18 +82,27 @@
                         android:layout_height="50dp"
                         android:layout_width="150dp"
                         android:layout_weight="1"
-                        android:layout_margin="0.5dp"
+                        android:layout_margin="1dp"
                         android:padding="2dp"
                         android:background="@android:color/white"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
                         android:text="Arrival Date" />
                     <TextView
                         android:textColor="@android:color/black"
                         android:gravity="center"
                         android:layout_height="50dp"
+                        android:layout_width="150dp"
                         android:layout_weight="1"
-                        android:layout_margin="0.5dp"
+                        android:layout_margin="1dp"
                         android:padding="2dp"
                         android:background="@android:color/white"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
                         android:text="# Hours/Week" />
                     <TextView
                         android:textColor="@android:color/black"
@@ -91,9 +110,13 @@
                         android:layout_height="50dp"
                         android:layout_width="150dp"
                         android:layout_weight="1"
-                        android:layout_margin="0.5dp"
+                        android:layout_margin="1dp"
                         android:padding="2dp"
                         android:background="@android:color/white"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
                         android:text="# Weeks Absent/Year" />
                     <TextView
                         android:textColor="@android:color/black"
@@ -101,9 +124,13 @@
                         android:layout_height="50dp"
                         android:layout_width="150dp"
                         android:layout_weight="1"
-                        android:layout_margin="0.5dp"
+                        android:layout_margin="1dp"
                         android:padding="2dp"
                         android:background="@android:color/white"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
                         android:text="Assigned Group" />
                     <TextView
                         android:textColor="@android:color/black"
@@ -111,13 +138,59 @@
                         android:layout_height="50dp"
                         android:layout_width="150dp"
                         android:layout_weight="1"
-                        android:layout_margin="0.5dp"
+                        android:layout_margin="1dp"
                         android:padding="2dp"
                         android:background="@android:color/white"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
                         android:text="Time In Group" />
+                    <TextView
+                        android:textColor="@android:color/black"
+                        android:gravity="center"
+                        android:layout_height="50dp"
+                        android:layout_width="150dp"
+                        android:layout_weight="1"
+                        android:layout_margin="1dp"
+                        android:padding="2dp"
+                        android:background="@android:color/white"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:text="# Previous Groups" />
+                    <TextView
+                        android:textColor="@android:color/black"
+                        android:gravity="center"
+                        android:layout_height="50dp"
+                        android:layout_width="150dp"
+                        android:layout_weight="1"
+                        android:layout_margin="1dp"
+                        android:padding="2dp"
+                        android:background="@android:color/white"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:text="Previous Care" />
+                    <TextView
+                        android:textColor="@android:color/black"
+                        android:gravity="center"
+                        android:layout_height="50dp"
+                        android:layout_width="150dp"
+                        android:layout_weight="1"
+                        android:layout_margin="1dp"
+                        android:padding="2dp"
+                        android:background="@android:color/white"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:text="Primary Caregiver" />
                 </TableRow>
             </TableLayout>
-        </HorizontalScrollView>
+        </org.chpir.android.roster.OHScrollView>
     </LinearLayout>
 
     <ScrollView
@@ -153,8 +226,8 @@
 
             </LinearLayout>
 
-            <HorizontalScrollView
-                android:id="@+id/table_scroll"
+            <org.chpir.android.roster.OHScrollView
+                android:id="@+id/content_scroll"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="2dp"
@@ -228,7 +301,7 @@
                             android:layout_height="0dp"/>
                     </TableRow>
                 </TableLayout>
-            </HorizontalScrollView>
+            </org.chpir.android.roster.OHScrollView>
         </LinearLayout>
     </ScrollView>
 
