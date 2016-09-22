@@ -9,7 +9,8 @@
         android:id="@+id/header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:baselineAligned="false">
+        android:baselineAligned="false"
+        android:orientation="horizontal">
 
         <LinearLayout
             android:id="@+id/header_1"
@@ -17,180 +18,26 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="2dp"
             android:layout_marginLeft="2dp"
-            android:background="@android:color/black">
-
-            <TextView
-                android:layout_height="50dp"
-                android:layout_width="150dp"
-                android:textColor="@android:color/black"
-                android:gravity="center"
-                android:layout_margin=".5dp"
-                android:padding="2dp"
-                android:background="#ffcccccc"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:text="Participant ID" />
+            android:background="@android:color/black"
+            android:orientation="horizontal">
 
         </LinearLayout>
 
-        <org.chpir.android.roster.OHScrollView
+        <org.chpir.android.roster.custom_views.OHScrollView
             android:id="@+id/header_scroll"
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
 
             <TableLayout
+                android:id="@+id/header_2"
                 android:layout_width="wrap_content"
                 android:layout_marginRight="2dp"
                 android:layout_marginLeft="2dp"
                 android:layout_height="wrap_content"
                 android:background="@android:color/black">
 
-                <TableRow>
-                    <TextView
-                        android:textColor="@android:color/black"
-                        android:gravity="center"
-                        android:layout_height="50dp"
-                        android:layout_width="150dp"
-                        android:layout_weight="1"
-                        android:layout_margin=".5dp"
-                        android:padding="2dp"
-                        android:background="@android:color/white"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:text="Gender" />
-                    <TextView
-                        android:textColor="@android:color/black"
-                        android:gravity="center"
-                        android:layout_height="50dp"
-                        android:layout_width="150dp"
-                        android:layout_weight="1"
-                        android:layout_margin=".5dp"
-                        android:padding="2dp"
-                        android:background="@android:color/white"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:text="Age" />
-                    <TextView
-                        android:textColor="@android:color/black"
-                        android:gravity="center"
-                        android:layout_height="50dp"
-                        android:layout_width="150dp"
-                        android:layout_weight="1"
-                        android:layout_margin=".5dp"
-                        android:padding="2dp"
-                        android:background="@android:color/white"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:text="Arrival Date" />
-                    <TextView
-                        android:textColor="@android:color/black"
-                        android:gravity="center"
-                        android:layout_height="50dp"
-                        android:layout_width="150dp"
-                        android:layout_weight="1"
-                        android:layout_margin=".5dp"
-                        android:padding="2dp"
-                        android:background="@android:color/white"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:text="# Hours/Week" />
-                    <TextView
-                        android:textColor="@android:color/black"
-                        android:gravity="center"
-                        android:layout_height="50dp"
-                        android:layout_width="150dp"
-                        android:layout_weight="1"
-                        android:layout_margin=".5dp"
-                        android:padding="2dp"
-                        android:background="@android:color/white"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:text="# Weeks Absent/Year" />
-                    <TextView
-                        android:textColor="@android:color/black"
-                        android:gravity="center"
-                        android:layout_height="50dp"
-                        android:layout_width="150dp"
-                        android:layout_weight="1"
-                        android:layout_margin=".5dp"
-                        android:padding="2dp"
-                        android:background="@android:color/white"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:text="Assigned Group" />
-                    <TextView
-                        android:textColor="@android:color/black"
-                        android:gravity="center"
-                        android:layout_height="50dp"
-                        android:layout_width="150dp"
-                        android:layout_weight="1"
-                        android:layout_margin=".5dp"
-                        android:padding="2dp"
-                        android:background="@android:color/white"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:text="Time In Group" />
-                    <TextView
-                        android:textColor="@android:color/black"
-                        android:gravity="center"
-                        android:layout_height="50dp"
-                        android:layout_width="150dp"
-                        android:layout_weight="1"
-                        android:layout_margin=".5dp"
-                        android:padding="2dp"
-                        android:background="@android:color/white"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:text="# Previous Groups" />
-                    <TextView
-                        android:textColor="@android:color/black"
-                        android:gravity="center"
-                        android:layout_height="50dp"
-                        android:layout_width="150dp"
-                        android:layout_weight="1"
-                        android:layout_margin=".5dp"
-                        android:padding="2dp"
-                        android:background="@android:color/white"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:text="Previous Care" />
-                    <TextView
-                        android:textColor="@android:color/black"
-                        android:gravity="center"
-                        android:layout_height="50dp"
-                        android:layout_width="150dp"
-                        android:layout_weight="1"
-                        android:layout_margin=".5dp"
-                        android:padding="2dp"
-                        android:background="@android:color/white"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:text="Primary Caregiver" />
-                </TableRow>
             </TableLayout>
-        </org.chpir.android.roster.OHScrollView>
+        </org.chpir.android.roster.custom_views.OHScrollView>
     </LinearLayout>
 
     <ScrollView
@@ -215,7 +62,7 @@
 
             </LinearLayout>
 
-            <org.chpir.android.roster.OHScrollView
+            <org.chpir.android.roster.custom_views.OHScrollView
                 android:id="@+id/content_scroll"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent">
@@ -229,7 +76,7 @@
                     android:background="@android:color/black">
 
                 </TableLayout>
-            </org.chpir.android.roster.OHScrollView>
+            </org.chpir.android.roster.custom_views.OHScrollView>
         </LinearLayout>
     </ScrollView>
 

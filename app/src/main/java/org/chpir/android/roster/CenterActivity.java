@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.chpir.android.roster.models.Center;
+
 import java.util.ArrayList;
 
 public class CenterActivity extends Activity {
@@ -34,24 +36,6 @@ public class CenterActivity extends Activity {
         for (char alp = 'A'; alp <= 'Z'; alp++) {
             myCenters.add(new Center(Long.toString(Math.round(Math.random() * 1000)) + "-" + alp,
                     "Center " + alp));
-        }
-    }
-
-    private class Center {
-        private String identifier;
-        private String name;
-
-        Center(String identifier, String name) {
-            this.identifier = identifier;
-            this.name = name;
-        }
-
-        String getIdentifier() {
-            return identifier;
-        }
-
-        String getName() {
-            return name;
         }
     }
 
