@@ -1,11 +1,11 @@
 package org.chpir.android.roster;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -22,7 +22,7 @@ import android.widget.TextView;
 import org.chpir.android.roster.custom_views.OHScrollView;
 import org.chpir.android.roster.listeners.ScrollViewListener;
 
-public class RosterActivity extends Activity implements ScrollViewListener {
+public class RosterActivity extends AppCompatActivity implements ScrollViewListener {
     final String TAG = "RosterActivity";
     final private int PADDING = 2;
     final private int MAX_LINES_PER_ROW = 1;
@@ -61,14 +61,14 @@ public class RosterActivity extends Activity implements ScrollViewListener {
                     .LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             TextView idView = new TextView(this);
             setTextViewAttributes(idView, layoutParams, ContextCompat.getColor(this,
-                    R.color.grayBackground), NON_HEADER_TEXT_SIZE, MAX_LINES_PER_ROW,
-                    Typeface.NORMAL);
+                    R.color.frozenColumnBackground), Color.WHITE, NON_HEADER_TEXT_SIZE,
+                    MAX_LINES_PER_ROW, Typeface.NORMAL);
             idView.setText(mHeaders[0] + " " + k);
             idView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startActivity(new Intent(RosterActivity.this, ParticipantDetailsActivity
-                            .class));
+//                    startActivity(new Intent(RosterActivity.this, ParticipantDetailsActivity
+//                            .class));
                 }
             });
             linearLayout.addView(idView);
@@ -79,7 +79,7 @@ public class RosterActivity extends Activity implements ScrollViewListener {
 
             for (int j = 1; j < mHeaders.length; j++) {
                 TextView view = new TextView(this);
-                setTextViewAttributes(view, params, Color.WHITE, NON_HEADER_TEXT_SIZE,
+                setTextViewAttributes(view, params, Color.WHITE, Color.BLACK, NON_HEADER_TEXT_SIZE,
                         MAX_LINES_PER_ROW, Typeface.NORMAL);
                 view.setText(mHeaders[j] + " " + k);
                 row.addView(view);
@@ -119,17 +119,17 @@ public class RosterActivity extends Activity implements ScrollViewListener {
     }
 
     private void setTextViewAttributes(TextView view, ViewGroup.MarginLayoutParams params, int
-            color, int textSize, int numLines, int typeface) {
+            backgroundColor, int textColor, int textSize, int numLines, int typeface) {
         params.setMargins(MARGIN, MARGIN, MARGIN, MARGIN);
         view.setHeight(HEIGHT);
         view.setWidth(WIDTH);
-        view.setTextColor(Color.BLACK);
+        view.setTextColor(textColor);
         view.setGravity(Gravity.CENTER);
         view.setPadding(PADDING, PADDING, PADDING, PADDING);
         view.setTypeface(view.getTypeface(), typeface);
         view.setTextSize(textSize);
         view.setMaxLines(numLines);
-        view.setBackgroundColor(color);
+        view.setBackgroundColor(backgroundColor);
         view.setEllipsize(TextUtils.TruncateAt.END);
         view.setLayoutParams(params);
     }
@@ -137,14 +137,16 @@ public class RosterActivity extends Activity implements ScrollViewListener {
     private void setLinearLayoutHeaderTextViewAttrs(TextView view) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout
                 .LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        setTextViewAttributes(view, params, ContextCompat.getColor(this, R.color.grayBackground),
-                HEADER_TEXT_SIZE, MAX_LINES_PER_ROW, Typeface.BOLD);
+        setTextViewAttributes(view, params, ContextCompat.getColor(this,
+                R.color.frozenColumnBackground), Color.WHITE, HEADER_TEXT_SIZE,
+                MAX_LINES_PER_ROW, Typeface.BOLD);
     }
 
     private void setTableRowLayoutHeaderTextViewAttrs(TextView view) {
         TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams
                 .MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
-        setTextViewAttributes(view, params, Color.WHITE, HEADER_TEXT_SIZE, MAX_LINES_PER_ROW,
+        setTextViewAttributes(view, params, ContextCompat.getColor(this,
+                R.color.frozenColumnBackground), Color.WHITE, HEADER_TEXT_SIZE, MAX_LINES_PER_ROW,
                 Typeface.BOLD);
     }
 
@@ -159,7 +161,9 @@ public class RosterActivity extends Activity implements ScrollViewListener {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.add_participant:
-                startActivity(new Intent(this, ParticipantDetailsActivity.class));
+                Intent intent = new Intent(this, ParticipantDetailsActivity.class);
+                intent.putExtra("RosterHeaders", mHeaders);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
