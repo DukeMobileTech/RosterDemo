@@ -19,6 +19,8 @@
         </activity>
         <activity android:name=".RosterActivity">
         </activity>
+        <activity android:name=".ParticipantActivity">
+        </activity>
     </application>
 
 </manifest>

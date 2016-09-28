@@ -71,7 +71,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
 
     private void initializeParticipants() {
         mParticipants = new ArrayList<>();
-        for (int k = 0; k < 10; k++) {
+        for (int k = 0; k < 5; k++) {
             mParticipants.add(new Participant(Question.defaultQuestions(),
                     UUID.randomUUID().toString()));
         }
@@ -107,7 +107,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         rosterHeaders.addView(row);
     }
 
-    private void setParticipantIdView(Participant participant) {
+    private void setParticipantIdView(final Participant participant) {
         LinearLayout linearLayout = (LinearLayout) findViewById(R.id.participant_id);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout
                 .LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -119,8 +119,9 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         idView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                    startActivity(new Intent(RosterActivity.this, ParticipantDetailsActivity
-//                            .class));
+                Intent intent = new Intent(RosterActivity.this, ParticipantActivity.class);
+                intent.putExtra("Participant", Parcels.wrap(participant));
+                startActivity(intent);
             }
         });
         linearLayout.addView(idView);

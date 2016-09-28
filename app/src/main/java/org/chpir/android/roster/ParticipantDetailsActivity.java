@@ -40,11 +40,14 @@ public class ParticipantDetailsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        mParticipant = new Participant(Question.defaultQuestions(),
-                UUID.randomUUID().toString());
+        mParticipant = Parcels.unwrap(getIntent().getParcelableExtra("Participant"));
+        if (mParticipant == null) {
+            mParticipant = new Participant(Question.defaultQuestions(),
+                    UUID.randomUUID().toString());
+        }
+
         mDrawer = (DrawerLayout) findViewById(R.id.roster_drawer_layout);
         navigationView = (NavigationView) findViewById(R.id.roster_drawer_view);
-
         setNavigationViewMenu();
         setNavigationViewListener(navigationView);
 
