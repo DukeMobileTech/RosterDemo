@@ -1,10 +1,10 @@
-package org.chpir.android.roster.custom_views;
+package org.chpir.android.roster.CustomViews;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.HorizontalScrollView;
 
-import org.chpir.android.roster.listeners.ScrollViewListener;
+import org.chpir.android.roster.Listeners.ScrollViewListener;
 
 public class OHScrollView extends HorizontalScrollView {
 

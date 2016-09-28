@@ -1,6 +1,6 @@
-package org.chpir.android.roster.listeners;
+package org.chpir.android.roster.Listeners;
 
-import org.chpir.android.roster.custom_views.OHScrollView;
+import org.chpir.android.roster.CustomViews.OHScrollView;
 
 public interface ScrollViewListener {
     public void onScrollChanged(OHScrollView scrollView, int x, int y, int oldx, int oldy);

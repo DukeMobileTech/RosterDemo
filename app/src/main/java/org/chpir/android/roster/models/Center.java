@@ -1,4 +1,4 @@
-package org.chpir.android.roster.models;
+package org.chpir.android.roster.Models;
 
 public class Center {
     private String identifier;

@@ -1,12 +1,15 @@
 <resources>
 
-    <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="homeAsUpIndicator">@mipmap/ic_drawer</item>
         <item name="android:homeAsUpIndicator">@mipmap/ic_drawer</item>
+    </style>
+
+    <style name="ButtonTheme" parent="Theme.AppCompat.Light">
+        <item name="colorControlHighlight">@color/colorControlHighlight</item>
+        <item name="colorButtonNormal">@color/colorButtonNormal</item>
     </style>
 
 </resources>

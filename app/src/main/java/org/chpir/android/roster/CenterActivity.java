@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.chpir.android.roster.models.Center;
+import org.chpir.android.roster.Models.Center;
 
 import java.util.ArrayList;
 

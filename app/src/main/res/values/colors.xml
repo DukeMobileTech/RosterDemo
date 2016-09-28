@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#4F7942</color>
     <color name="colorAccent">#FF4081</color>
     <color name="frozenColumnBackground">#5F7C8A</color>
+    <color name="colorControlHighlight">#009587</color>
+    <color name="colorButtonNormal">#2095F2</color>
 </resources>
