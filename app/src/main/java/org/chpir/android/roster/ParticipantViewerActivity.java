@@ -71,6 +71,14 @@ public class ParticipantViewerActivity extends AppCompatActivity {
         showParticipantDetails();
     }
 
+    @Override
+    public void onBackPressed () {
+        Intent intent = new Intent(this, RosterActivity.class);
+        intent.putExtra("Participant", Parcels.wrap(mParticipant));
+        setResult(200, intent);
+        finish();
+    }
+
     private void showParticipantDetails() {
         QuestionAdapter adapter = new QuestionAdapter(mParticipant.getQuestions());
         if (mRecyclerView != null) {

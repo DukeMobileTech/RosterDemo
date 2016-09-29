@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +37,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     final private int HEADER_TEXT_SIZE = 18;
     final private int NON_HEADER_TEXT_SIZE = 15;
     final private int NEW_PARTICIPANT_REQUEST_CODE = 100;
+    final private int OLD_PARTICIPANT_REQUEST_CODE = 200;
     private int HEIGHT;
     private int WIDTH;
     private int MARGIN;
@@ -44,6 +46,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     private boolean interceptScroll = true;
     private ArrayList<Participant> mParticipants;
     private TableLayout mTableLayout;
+    private LinearLayout mLinearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,17 +58,14 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         setDimensions();
         setHeaders();
 
+        mTableLayout = (TableLayout) findViewById(R.id.content_table);
+        mLinearLayout = (LinearLayout) findViewById(R.id.participant_id);
         headerScrollView = (OHScrollView) findViewById(R.id.header_scroll);
         contentScrollView = (OHScrollView) findViewById(R.id.content_scroll);
         headerScrollView.setScrollViewListener(this);
         contentScrollView.setScrollViewListener(this);
 
-        for (Participant participant : mParticipants) {
-            mTableLayout = (TableLayout) findViewById(R.id.content_table);
-            setParticipantIdView(participant);
-            mTableLayout.addView(getParticipantRow(participant));
-        }
-
+        displayParticipants();
     }
 
     private void initializeParticipants() {
@@ -105,40 +105,13 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         rosterHeaders.addView(row);
     }
 
-    private void setParticipantIdView(final Participant participant) {
-        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.participant_id);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout
-                .LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        TextView idView = new TextView(this);
-        setTextViewAttributes(idView, layoutParams, ContextCompat.getColor(this,
-                R.color.frozenColumnBackground), Color.WHITE, NON_HEADER_TEXT_SIZE,
-                MAX_LINES_PER_ROW, Typeface.NORMAL);
-        idView.setText(participant.identifier());
-        idView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(RosterActivity.this, ParticipantViewerActivity.class);
-                intent.putExtra("Participant", Parcels.wrap(participant));
-                startActivity(intent);
-            }
-        });
-        linearLayout.addView(idView);
-    }
-
-    @NonNull
-    private TableRow getParticipantRow(Participant participant) {
-        TableRow row = new TableRow(this);
-        TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams
-                .MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
-
-        for (int k = 1; k < participant.getQuestions().size(); k++) {
-            TextView view = new TextView(this);
-            setTextViewAttributes(view, params, Color.WHITE, Color.BLACK,
-                    NON_HEADER_TEXT_SIZE, MAX_LINES_PER_ROW, Typeface.NORMAL);
-            view.setText(participant.getQuestions().get(k).getResponse());
-            row.addView(view);
+    private void displayParticipants() {
+        mTableLayout.removeAllViews();
+        mLinearLayout.removeAllViews();
+        for (Participant participant : mParticipants) {
+            setParticipantIdView(participant);
+            mTableLayout.addView(getParticipantRow(participant));
         }
-        return row;
     }
 
     private void setLinearLayoutHeaderTextViewAttrs(TextView view) {
@@ -155,6 +128,41 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         setTextViewAttributes(view, params, ContextCompat.getColor(this,
                 R.color.frozenColumnBackground), Color.WHITE, HEADER_TEXT_SIZE, MAX_LINES_PER_ROW,
                 Typeface.BOLD);
+    }
+
+    private void setParticipantIdView(final Participant participant) {
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout
+                .LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        TextView idView = new TextView(this);
+        setTextViewAttributes(idView, layoutParams, ContextCompat.getColor(this,
+                R.color.frozenColumnBackground), Color.WHITE, NON_HEADER_TEXT_SIZE,
+                MAX_LINES_PER_ROW, Typeface.NORMAL);
+        idView.setText(participant.identifier());
+        idView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RosterActivity.this, ParticipantViewerActivity.class);
+                intent.putExtra("Participant", Parcels.wrap(participant));
+                startActivityForResult(intent, OLD_PARTICIPANT_REQUEST_CODE);
+            }
+        });
+        mLinearLayout.addView(idView);
+    }
+
+    @NonNull
+    private TableRow getParticipantRow(Participant participant) {
+        TableRow row = new TableRow(this);
+        TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams
+                .MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+
+        for (int k = 1; k < participant.getQuestions().size(); k++) {
+            TextView view = new TextView(this);
+            setTextViewAttributes(view, params, Color.WHITE, Color.BLACK,
+                    NON_HEADER_TEXT_SIZE, MAX_LINES_PER_ROW, Typeface.NORMAL);
+            view.setText(participant.getQuestions().get(k).getResponse());
+            row.addView(view);
+        }
+        return row;
     }
 
     private void setTextViewAttributes(TextView view, ViewGroup.MarginLayoutParams params, int
@@ -207,12 +215,30 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == NEW_PARTICIPANT_REQUEST_CODE && data != null) {
+        Log.i(TAG, "requestCode: " + requestCode);
+        if (data != null) {
             Participant participant = Parcels.unwrap(data.getParcelableExtra("Participant"));
-            mParticipants.add(participant);
-            setParticipantIdView(participant);
-            mTableLayout.addView(getParticipantRow(participant));
+            if (requestCode == NEW_PARTICIPANT_REQUEST_CODE) {
+                mParticipants.add(participant);
+                setParticipantIdView(participant);
+                mTableLayout.addView(getParticipantRow(participant));
+            } else if (requestCode == OLD_PARTICIPANT_REQUEST_CODE) {
+                // TODO Fix this monstrosity
+                for (int k = 0; k < mParticipants.size(); k++) {
+                    if (mParticipants.get(k).getIdentifier().equals(participant.getIdentifier())) {
+                        mParticipants.set(k, participant);
+                        break;
+                    }
+                }
+                displayParticipants();
+            }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        displayParticipants();
     }
 
 }
