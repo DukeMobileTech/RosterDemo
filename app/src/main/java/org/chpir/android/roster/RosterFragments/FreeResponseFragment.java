@@ -25,6 +25,7 @@ public class FreeResponseFragment extends RosterFragment {
             public void afterTextChanged(Editable s) {
             }
         });
+        editText.requestFocus();
         responseComponent.addView(editText);
     }
 }

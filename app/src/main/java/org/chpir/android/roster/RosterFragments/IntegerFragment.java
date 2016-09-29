@@ -25,6 +25,7 @@ public class IntegerFragment extends RosterFragment {
             public void afterTextChanged(Editable s) {
             }
         });
+        editText.requestFocus();
         responseComponent.addView(editText);
     }
 }

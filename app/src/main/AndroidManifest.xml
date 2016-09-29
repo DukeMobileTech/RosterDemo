@@ -15,11 +15,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ParticipantDetailsActivity">
+        <activity android:name=".ParticipantEditorActivity">
         </activity>
         <activity android:name=".RosterActivity">
         </activity>
-        <activity android:name=".ParticipantActivity">
+        <activity android:name=".ParticipantViewerActivity">
         </activity>
     </application>
 

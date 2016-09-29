@@ -119,7 +119,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         idView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(RosterActivity.this, ParticipantActivity.class);
+                Intent intent = new Intent(RosterActivity.this, ParticipantViewerActivity.class);
                 intent.putExtra("Participant", Parcels.wrap(participant));
                 startActivity(intent);
             }
@@ -186,7 +186,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.add_participant:
-                startActivityForResult(new Intent(this, ParticipantDetailsActivity.class),
+                startActivityForResult(new Intent(this, ParticipantEditorActivity.class),
                         NEW_PARTICIPANT_REQUEST_CODE);
                 return true;
             default:

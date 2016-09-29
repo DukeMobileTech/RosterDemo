@@ -9,20 +9,9 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/participant_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:scrollbars="vertical">
 
     </android.support.v7.widget.RecyclerView>
-
-    <Button
-        android:id="@+id/edit_participant"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:padding="20dp"
-        android:theme="@style/ButtonTheme"
-        android:textColor="@android:color/white"
-        android:text="EDIT" />
 
 </LinearLayout>

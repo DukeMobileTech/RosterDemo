@@ -23,8 +23,8 @@ import org.parceler.Parcels;
 
 import java.util.UUID;
 
-public class ParticipantDetailsActivity extends AppCompatActivity {
-    private static final String TAG = "ParticipantDetailsActivity";
+public class ParticipantEditorActivity extends AppCompatActivity {
+    private static final String TAG = "ParticipantEditorActivity";
     private DrawerLayout mDrawer;
     private NavigationView navigationView;
     private int currentMenuItem = 0;
@@ -36,9 +36,12 @@ public class ParticipantDetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-        setContentView(R.layout.activity_participant_details);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        setContentView(R.layout.activity_participant_editor);
+        if(getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
+        setTitle("New Participant");
 
         mParticipant = Parcels.unwrap(getIntent().getParcelableExtra("Participant"));
         if (mParticipant == null) {
@@ -63,16 +66,6 @@ public class ParticipantDetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 updateFragment(currentMenuItem + 1);
-            }
-        });
-        Button saveButton = (Button) findViewById(R.id.save_participant);
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ParticipantDetailsActivity.this, RosterActivity.class);
-                intent.putExtra("newParticipant", Parcels.wrap(mParticipant));
-                setResult(100, intent);
-                finish();
             }
         });
     }
@@ -109,7 +102,7 @@ public class ParticipantDetailsActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.drawer_menu, menu);
+        getMenuInflater().inflate(R.menu.participant_editor_menu, menu);
         return true;
     }
 
@@ -119,9 +112,19 @@ public class ParticipantDetailsActivity extends AppCompatActivity {
             case android.R.id.home:
                 mDrawer.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.save_new_participant:
+                saveNewParticipant();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
+    }
 
-        return super.onOptionsItemSelected(item);
+    private void saveNewParticipant() {
+        Intent intent = new Intent(ParticipantEditorActivity.this, RosterActivity.class);
+        intent.putExtra("newParticipant", Parcels.wrap(mParticipant));
+        setResult(100, intent);
+        finish();
     }
 
     @Override
