@@ -20,20 +20,17 @@ import org.parceler.Parcels;
 import java.util.List;
 
 public class ParticipantViewerActivity extends AppCompatActivity {
+    final private int EDIT_PARTICIPANT_REQUEST_CODE = 100;
     private Participant mParticipant;
+    private RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_participant_viewer);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.participant_recycler_view);
+        mRecyclerView = (RecyclerView) findViewById(R.id.participant_recycler_view);
         mParticipant = Parcels.unwrap(getIntent().getParcelableExtra("Participant"));
         setTitle(mParticipant.getIdentifier());
-        QuestionAdapter adapter = new QuestionAdapter(mParticipant.getQuestions());
-        if (recyclerView != null) {
-            recyclerView.setAdapter(adapter);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        }
     }
 
     @Override
@@ -57,7 +54,29 @@ public class ParticipantViewerActivity extends AppCompatActivity {
     private void editParticipant() {
         Intent intent = new Intent(ParticipantViewerActivity.this, ParticipantEditorActivity.class);
         intent.putExtra("Participant", Parcels.wrap(mParticipant));
-        startActivity(intent);
+        startActivityForResult(intent, EDIT_PARTICIPANT_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == EDIT_PARTICIPANT_REQUEST_CODE && data != null) {
+            mParticipant = Parcels.unwrap(data.getParcelableExtra("Participant"));
+            showParticipantDetails();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showParticipantDetails();
+    }
+
+    private void showParticipantDetails() {
+        QuestionAdapter adapter = new QuestionAdapter(mParticipant.getQuestions());
+        if (mRecyclerView != null) {
+            mRecyclerView.setAdapter(adapter);
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        }
     }
 
     private class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuestionViewHolder> {

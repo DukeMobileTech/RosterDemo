@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -101,7 +100,6 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
                 headerView.setText(header.toString());
                 setTableRowLayoutHeaderTextViewAttrs(headerView);
                 row.addView(headerView);
-                Log.i(TAG, "Added header: " + header);
             }
         }
         rosterHeaders.addView(row);
@@ -115,7 +113,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         setTextViewAttributes(idView, layoutParams, ContextCompat.getColor(this,
                 R.color.frozenColumnBackground), Color.WHITE, NON_HEADER_TEXT_SIZE,
                 MAX_LINES_PER_ROW, Typeface.NORMAL);
-        idView.setText(participant.getIdentifier().substring(0, 15));
+        idView.setText(participant.identifier());
         idView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -209,8 +207,8 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == NEW_PARTICIPANT_REQUEST_CODE) {
-            Participant participant = Parcels.unwrap(data.getParcelableExtra("newParticipant"));
+        if (requestCode == NEW_PARTICIPANT_REQUEST_CODE && data != null) {
+            Participant participant = Parcels.unwrap(data.getParcelableExtra("Participant"));
             mParticipants.add(participant);
             setParticipantIdView(participant);
             mTableLayout.addView(getParticipantRow(participant));

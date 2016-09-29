@@ -37,7 +37,7 @@ public class ParticipantEditorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_participant_editor);
-        if(getSupportActionBar() != null) {
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
@@ -113,16 +113,21 @@ public class ParticipantEditorActivity extends AppCompatActivity {
                 mDrawer.openDrawer(GravityCompat.START);
                 return true;
             case R.id.save_new_participant:
-                saveNewParticipant();
+                saveParticipant();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void saveNewParticipant() {
-        Intent intent = new Intent(ParticipantEditorActivity.this, RosterActivity.class);
-        intent.putExtra("newParticipant", Parcels.wrap(mParticipant));
+    private void saveParticipant() {
+        Log.i(TAG, "Called By: " + getCallingActivity());
+        Class callingClass = RosterActivity.class;
+        if (getCallingActivity() != null) {
+            callingClass = getCallingActivity().getClass();
+        }
+        Intent intent = new Intent(ParticipantEditorActivity.this, callingClass);
+        intent.putExtra("Participant", Parcels.wrap(mParticipant));
         setResult(100, intent);
         finish();
     }
