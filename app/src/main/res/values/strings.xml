@@ -2,4 +2,6 @@
     <string name="app_name">Roster</string>
     <string name="save">SAVE</string>
     <string name="edit">EDIT</string>
+    <string name="next">NEXT</string>
+    <string name="previous">PREV</string>
 </resources>
