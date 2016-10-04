@@ -1,5 +1,6 @@
 package org.chpir.android.roster;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,14 +12,17 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Select;
 
 import org.chpir.android.roster.Models.Center;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class CenterActivity extends AppCompatActivity {
 
-    private ArrayList<Center> myCenters;
+    private List<Center> myCenters;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,16 +36,33 @@ public class CenterActivity extends AppCompatActivity {
     }
 
     private void initializeCenters() {
-        myCenters = new ArrayList<>();
-        for (char alp = 'A'; alp <= 'Z'; alp++) {
-            myCenters.add(new Center(Long.toString(Math.round(Math.random() * 1000)) + "-" + alp,
-                    "Center " + alp));
+        //fetch data
+        myCenters = new Select()
+                .from(Center.class)
+                .orderBy("Name ASC")
+                .execute();
+        if(myCenters.size()==0){
+            myCenters = new ArrayList<>();
+            //hardcode center data
+            ActiveAndroid.beginTransaction();
+            try {
+                for (char alp = 'A'; alp <= 'Z'; alp++) {
+                    Center oneCenter = new Center(Long.toString(Math.round(Math.random() * 1000)) + "-" + alp,
+                            "Center " + alp);
+                    myCenters.add(oneCenter);
+                    oneCenter.save();
+                }
+                ActiveAndroid.setTransactionSuccessful();
+            }
+            finally {
+                ActiveAndroid.endTransaction();
+            }
         }
     }
 
     private class CentersAdapter extends ArrayAdapter<Center> {
 
-        CentersAdapter(Context context, ArrayList<Center> centers) {
+        CentersAdapter(Context context, List<Center> centers) {
             super(context, 0, centers);
         }
 

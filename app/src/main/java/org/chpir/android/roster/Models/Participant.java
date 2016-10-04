@@ -1,13 +1,19 @@
 package org.chpir.android.roster.Models;
 
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+
 import org.parceler.Parcel;
 
 import java.util.ArrayList;
 
-@Parcel
-public class Participant {
-    ArrayList<Question> mQuestions;
-    String mIdentifier;
+@Table(name="Participants")
+public class Participant extends Model{
+    @Column(name="Questions")
+    private ArrayList<Question> mQuestions;
+    @Column(name="Identifier")
+    private String mIdentifier;
 
     public Participant() {
     }
