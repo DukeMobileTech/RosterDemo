@@ -13,9 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.activeandroid.query.Select;
+
+import org.chpir.android.roster.Models.Center;
 import org.chpir.android.roster.Models.Participant;
 import org.chpir.android.roster.Models.Question;
-import org.parceler.Parcels;
 
 import java.util.List;
 
@@ -29,8 +31,9 @@ public class ParticipantViewerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_participant_viewer);
         mRecyclerView = (RecyclerView) findViewById(R.id.participant_recycler_view);
-        mParticipant = Parcels.unwrap(getIntent().getParcelableExtra("Participant"));
-        setTitle(mParticipant.getIdentifier());
+        String participantIdentifier = getIntent().getStringExtra("Participant");
+        mParticipant = new Select().from(Center.class).where("Identifier = ?", participantIdentifier).executeSingle();
+        setTitle(participantIdentifier);
     }
 
     @Override
@@ -53,14 +56,15 @@ public class ParticipantViewerActivity extends AppCompatActivity {
 
     private void editParticipant() {
         Intent intent = new Intent(ParticipantViewerActivity.this, ParticipantEditorActivity.class);
-        intent.putExtra("Participant", Parcels.wrap(mParticipant));
+        intent.putExtra("Participant", mParticipant.getIdentifier());
         startActivityForResult(intent, EDIT_PARTICIPANT_REQUEST_CODE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == EDIT_PARTICIPANT_REQUEST_CODE && data != null) {
-            mParticipant = Parcels.unwrap(data.getParcelableExtra("Participant"));
+            String participantIdentifier = getIntent().getStringExtra("Participant");
+            mParticipant = new Select().from(Center.class).where("Identifier = ?", participantIdentifier).executeSingle();
             showParticipantDetails();
         }
     }
@@ -74,7 +78,7 @@ public class ParticipantViewerActivity extends AppCompatActivity {
     @Override
     public void onBackPressed () {
         Intent intent = new Intent(this, RosterActivity.class);
-        intent.putExtra("Participant", Parcels.wrap(mParticipant));
+        intent.putExtra("Participant", mParticipant.getIdentifier());
         setResult(200, intent);
         finish();
     }
