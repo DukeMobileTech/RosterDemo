@@ -13,15 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.activeandroid.query.Select;
-
-import org.chpir.android.roster.Models.Center;
 import org.chpir.android.roster.Models.Participant;
 import org.chpir.android.roster.Models.Question;
 
 import java.util.List;
 
 public class ParticipantViewerActivity extends AppCompatActivity {
+    public final static String EXTRA_PARTICIPANT_ID = "org.chpir.android.roster.participant_id";
     final private int EDIT_PARTICIPANT_REQUEST_CODE = 100;
     private Participant mParticipant;
     private RecyclerView mRecyclerView;
@@ -31,9 +29,11 @@ public class ParticipantViewerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_participant_viewer);
         mRecyclerView = (RecyclerView) findViewById(R.id.participant_recycler_view);
-        String participantIdentifier = getIntent().getStringExtra("Participant");
-        mParticipant = new Select().from(Center.class).where("Identifier = ?", participantIdentifier).executeSingle();
-        setTitle(participantIdentifier);
+        String participantId = getIntent().getStringExtra(RosterActivity.EXTRA_PARTICIPANT_ID);
+        if (participantId != null) {
+            mParticipant = Participant.findByIdentifier(participantId);
+            setTitle(participantId);
+        }
     }
 
     @Override
@@ -56,17 +56,28 @@ public class ParticipantViewerActivity extends AppCompatActivity {
 
     private void editParticipant() {
         Intent intent = new Intent(ParticipantViewerActivity.this, ParticipantEditorActivity.class);
-        intent.putExtra("Participant", mParticipant.getIdentifier());
+        intent.putExtra(EXTRA_PARTICIPANT_ID, mParticipant.getIdentifier());
         startActivityForResult(intent, EDIT_PARTICIPANT_REQUEST_CODE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == EDIT_PARTICIPANT_REQUEST_CODE && data != null) {
-            String participantIdentifier = getIntent().getStringExtra("Participant");
-            mParticipant = new Select().from(Center.class).where("Identifier = ?", participantIdentifier).executeSingle();
-            showParticipantDetails();
+            String participantIdentifier = getIntent().getStringExtra(ParticipantEditorActivity
+                    .EXTRA_PARTICIPANT_ID);
+            if (participantIdentifier != null) {
+                mParticipant = Participant.findByIdentifier(participantIdentifier);
+                showParticipantDetails();
+            }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, RosterActivity.class);
+        intent.putExtra(RosterActivity.EXTRA_PARTICIPANT_ID, mParticipant.getIdentifier());
+        setResult(200, intent);
+        finish();
     }
 
     @Override
@@ -75,16 +86,8 @@ public class ParticipantViewerActivity extends AppCompatActivity {
         showParticipantDetails();
     }
 
-    @Override
-    public void onBackPressed () {
-        Intent intent = new Intent(this, RosterActivity.class);
-        intent.putExtra("Participant", mParticipant.getIdentifier());
-        setResult(200, intent);
-        finish();
-    }
-
     private void showParticipantDetails() {
-        QuestionAdapter adapter = new QuestionAdapter(mParticipant.getQuestions());
+        QuestionAdapter adapter = new QuestionAdapter(mParticipant.questions());
         if (mRecyclerView != null) {
             mRecyclerView.setAdapter(adapter);
             mRecyclerView.setLayoutManager(new LinearLayoutManager(this));

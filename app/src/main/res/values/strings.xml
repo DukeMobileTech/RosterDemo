@@ -4,4 +4,6 @@
     <string name="edit">EDIT</string>
     <string name="next">NEXT</string>
     <string name="previous">PREV</string>
+    <string name="centers">Centers</string>
+    <string name="new_participant">New Participant</string>
 </resources>

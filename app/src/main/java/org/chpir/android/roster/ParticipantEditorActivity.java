@@ -11,16 +11,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 
+import org.chpir.android.roster.Models.Center;
 import org.chpir.android.roster.Models.Participant;
 import org.chpir.android.roster.Models.Question;
-import org.chpir.android.roster.Models.QuestionHeader;
 import org.chpir.android.roster.RosterFragments.RosterFragment;
 import org.chpir.android.roster.RosterFragments.RosterFragmentGenerator;
-import org.parceler.Parcels;
-
-import java.util.UUID;
 
 public class ParticipantEditorActivity extends AppCompatActivity {
+    public final static String EXTRA_QUESTION_ID = "org.chpir.android.roster.question_id";
+    public final static String EXTRA_PARTICIPANT_ID = "org.chpir.android.roster.participant_id";
     private static final String TAG = "ParticipantEditorActivity";
     private DrawerLayout mDrawer;
     private NavigationView navigationView;
@@ -36,12 +35,17 @@ public class ParticipantEditorActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
-        setTitle("New Participant");
+        setTitle(getString(R.string.new_participant));
 
-        mParticipant = Parcels.unwrap(getIntent().getParcelableExtra("Participant"));
-        if (mParticipant == null) {
-            mParticipant = new Participant(Question.defaultQuestions(),
-                    UUID.randomUUID().toString());
+        String centerId = getIntent().getStringExtra(RosterActivity.EXTRA_CENTER_ID);
+        String participantId = getIntent().getStringExtra(ParticipantViewerActivity
+                .EXTRA_PARTICIPANT_ID);
+        if (participantId == null && centerId != null) {
+            mParticipant = new Participant();
+            mParticipant.setCenter(Center.findByIdentifier(centerId));
+            mParticipant.saveParticipant();
+        } else {
+            mParticipant = Participant.findByIdentifier(participantId);
         }
 
         mDrawer = (DrawerLayout) findViewById(R.id.roster_drawer_layout);
@@ -58,7 +62,7 @@ public class ParticipantEditorActivity extends AppCompatActivity {
     private void setNavigationViewMenu() {
         Menu menu = navigationView.getMenu();
         int index = 0;
-        for (QuestionHeader header : QuestionHeader.values()) {
+        for (Question.QuestionHeader header : Question.QuestionHeader.values()) {
             menu.add(R.id.drawer_menu_group, index, Menu.NONE, header.toString())
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             index++;
@@ -82,9 +86,9 @@ public class ParticipantEditorActivity extends AppCompatActivity {
     private void updateFragment(int position) {
         currentMenuItem = position;
         RosterFragment fragment = RosterFragmentGenerator.createQuestionFragment(
-                QuestionHeader.getByIndex(position));
+                Question.QuestionHeader.getByIndex(position).getQuestionType());
         Bundle bundle = new Bundle();
-        bundle.putParcelable("Question", Parcels.wrap(mParticipant.getQuestions().get(position)));
+        bundle.putString(EXTRA_QUESTION_ID, mParticipant.questions().get(position).getIdentifier());
         fragment.setArguments(bundle);
         switchOutFragment(fragment);
         invalidateOptionsMenu();
@@ -126,7 +130,7 @@ public class ParticipantEditorActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (currentMenuItem == 0) {
             menu.findItem(R.id.menu_item_previous).setVisible(false);
-        } else if (currentMenuItem == mParticipant.getQuestions().size() - 1) {
+        } else if (currentMenuItem == mParticipant.questions().size() - 1) {
             menu.findItem(R.id.menu_item_next).setVisible(false);
         }
         return super.onPrepareOptionsMenu(menu);
@@ -153,12 +157,13 @@ public class ParticipantEditorActivity extends AppCompatActivity {
     }
 
     private void saveParticipant() {
+        mParticipant.save();
         Class callingClass = RosterActivity.class;
         if (getCallingActivity() != null) {
             callingClass = getCallingActivity().getClass();
         }
         Intent intent = new Intent(ParticipantEditorActivity.this, callingClass);
-        intent.putExtra("Participant", Parcels.wrap(mParticipant));
+        intent.putExtra(EXTRA_PARTICIPANT_ID, mParticipant.getIdentifier());
         setResult(100, intent);
         finish();
     }

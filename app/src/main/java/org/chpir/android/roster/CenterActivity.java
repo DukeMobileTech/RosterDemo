@@ -1,6 +1,5 @@
 package org.chpir.android.roster;
 
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,23 +11,21 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.query.Select;
 
 import org.chpir.android.roster.Models.Center;
+import org.chpir.android.roster.Utils.SeedData;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CenterActivity extends AppCompatActivity {
-
+public final static String EXTRA_CENTER_ID = "org.chpir.android.roster.center_id";
     private List<Center> myCenters;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_center);
-        setTitle("Centers");
+        setTitle(getString(R.string.centers));
         initializeCenters();
         CentersAdapter adapter = new CentersAdapter(this, myCenters);
         ListView listView = (ListView) findViewById(R.id.center_list);
@@ -36,27 +33,10 @@ public class CenterActivity extends AppCompatActivity {
     }
 
     private void initializeCenters() {
-        //fetch data
-        myCenters = new Select()
-                .from(Center.class)
-                .orderBy("Name ASC")
-                .execute();
-        if(myCenters.size()==0){
-            myCenters = new ArrayList<>();
-            //hardcode center data
-            ActiveAndroid.beginTransaction();
-            try {
-                for (char alp = 'A'; alp <= 'Z'; alp++) {
-                    Center oneCenter = new Center(Long.toString(Math.round(Math.random() * 1000)) + "-" + alp,
-                            "Center " + alp);
-                    myCenters.add(oneCenter);
-                    oneCenter.save();
-                }
-                ActiveAndroid.setTransactionSuccessful();
-            }
-            finally {
-                ActiveAndroid.endTransaction();
-            }
+        myCenters = Center.findAll();
+        if (myCenters.size() == 0) {
+            SeedData.createSeedCenters();
+            myCenters = Center.findAll();
         }
     }
 
@@ -82,7 +62,7 @@ public class CenterActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(CenterActivity.this, RosterActivity.class);
-                    intent.putExtra("CenterName", center.getName());
+                    intent.putExtra(EXTRA_CENTER_ID, center.getIdentifier());
                     startActivity(intent);
                 }
             });

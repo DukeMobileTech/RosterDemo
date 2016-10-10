@@ -3,39 +3,57 @@ package org.chpir.android.roster.Models;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
 
-import org.parceler.Parcel;
+import org.chpir.android.roster.Utils.SeedData;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
-@Table(name="Participants")
-public class Participant extends Model{
-    @Column(name="Questions")
-    private ArrayList<Question> mQuestions;
-    @Column(name="Identifier")
+@Table(name = "Participants")
+public class Participant extends Model {
+    @Column(name = "Identifier")
     private String mIdentifier;
+    @Column(name = "Center")
+    private Center mCenter;
 
     public Participant() {
+        super();
+        this.mIdentifier = UUID.randomUUID().toString();
     }
 
-    public Participant(ArrayList<Question> questions, String id) {
-        this.mQuestions = questions;
-        this.mIdentifier = id;
-    }
-
-    public ArrayList<Question> getQuestions() {
-        return mQuestions;
+    public static Participant findByIdentifier(String participantId) {
+        return new Select().from(Participant.class).where("Identifier = ?", participantId)
+                .executeSingle();
     }
 
     public String identifier() {
-        if (mQuestions.get(0).getResponse() == null || mQuestions.get(0).getResponse().isEmpty()) {
+        if (questions().size() == 0 || questions().get(0).getResponse() == null || questions()
+                .get(0).getResponse().isEmpty()) {
             return mIdentifier;
         } else {
-            return mQuestions.get(0).getResponse();
+            return questions().get(0).getResponse();
         }
+    }
+
+    public List<Question> questions() {
+        return new Select().from(Question.class).where("Participant = ?", getId()).execute();
+    }
+
+    public void saveParticipant() {
+        this.save();
+        SeedData.createSeedQuestions(this);
     }
 
     public String getIdentifier() {
         return mIdentifier;
+    }
+
+    public Center getCenter() {
+        return mCenter;
+    }
+
+    public void setCenter(Center center) {
+        mCenter = center;
     }
 }

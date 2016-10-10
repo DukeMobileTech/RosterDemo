@@ -1,12 +1,12 @@
 package org.chpir.android.roster.RosterFragments;
 
-import org.chpir.android.roster.Models.QuestionHeader;
+import org.chpir.android.roster.Models.Question;
 
 public class RosterFragmentGenerator {
 
-    public static RosterFragment createQuestionFragment(QuestionHeader.QuestionType type) {
+    public static RosterFragment createQuestionFragment(Question.QuestionType type) {
         switch (type) {
-            case FREE_RESPONSE :
+            case FREE_RESPONSE:
                 return new FreeResponseFragment();
             case INTEGER:
                 return new IntegerFragment();

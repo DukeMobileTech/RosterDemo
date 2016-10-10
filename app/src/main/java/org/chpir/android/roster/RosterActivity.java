@@ -20,22 +20,18 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.query.Select;
-
 import org.chpir.android.roster.CustomViews.OHScrollView;
 import org.chpir.android.roster.Listeners.ScrollViewListener;
 import org.chpir.android.roster.Models.Center;
 import org.chpir.android.roster.Models.Participant;
 import org.chpir.android.roster.Models.Question;
-import org.chpir.android.roster.Models.QuestionHeader;
-import org.parceler.Parcels;
+import org.chpir.android.roster.Utils.SeedData;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class RosterActivity extends AppCompatActivity implements ScrollViewListener {
+    public final static String EXTRA_CENTER_ID = "org.chpir.android.roster.center_id";
+    public final static String EXTRA_PARTICIPANT_ID = "org.chpir.android.roster.participant_id";
     final String TAG = "RosterActivity";
     final private int PADDING = 2;
     final private int MAX_LINES_PER_ROW = 1;
@@ -52,13 +48,18 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     private List<Participant> mParticipants;
     private TableLayout mTableLayout;
     private LinearLayout mLinearLayout;
+    private Center mCenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_roster);
-        setTitle(getIntent().getStringExtra("CenterName"));
+        String centerId = getIntent().getStringExtra(CenterActivity.EXTRA_CENTER_ID);
+        if (centerId != null) {
+            mCenter = Center.findByIdentifier(centerId);
+            setTitle(mCenter.getName());
+        }
         initializeParticipants();
         setDimensions();
         setHeaders();
@@ -74,20 +75,10 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     }
 
     private void initializeParticipants() {
-        //fetch data
-        mParticipants = new Select()
-                .from(Center.class)
-                .orderBy("Name ASC")
-                .execute();
-        if(mParticipants==null || mParticipants.size()==0){
-            mParticipants = new ArrayList<>();
-            //hardcode center data
-            for (int k = 0; k < 5; k++) {
-                Participant oneParticipant = new Participant(Question.defaultQuestions(),
-                        UUID.randomUUID().toString());
-                mParticipants.add(oneParticipant);
-                oneParticipant.save();
-            }
+        mParticipants = mCenter.participants();
+        if (mParticipants.size() == 0) {
+            SeedData.createSeedParticipants(mCenter);
+            mParticipants = mCenter.participants();
         }
     }
 
@@ -102,15 +93,15 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         LinearLayout participantIDLayout = (LinearLayout) findViewById(R.id.header_1);
         TextView idHeader = new TextView(this);
         setLinearLayoutHeaderTextViewAttrs(idHeader);
-        idHeader.setText(QuestionHeader.PARTICIPANT_ID.toString());
+        idHeader.setText(Question.QuestionHeader.PARTICIPANT_ID.toString());
         participantIDLayout.addView(idHeader);
 
         TableLayout rosterHeaders = (TableLayout) findViewById(R.id.header_2);
         TableRow row = new TableRow(this);
         row.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams
                 .MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-        for (QuestionHeader header : QuestionHeader.values()) {
-            if (header != QuestionHeader.PARTICIPANT_ID) {
+        for (Question.QuestionHeader header : Question.QuestionHeader.values()) {
+            if (header != Question.QuestionHeader.PARTICIPANT_ID) {
                 TextView headerView = new TextView(this);
                 headerView.setText(header.toString());
                 setTableRowLayoutHeaderTextViewAttrs(headerView);
@@ -133,7 +124,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout
                 .LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         setTextViewAttributes(view, params, ContextCompat.getColor(this,
-                        R.color.frozenColumnBackground), Color.WHITE, HEADER_TEXT_SIZE,
+                R.color.frozenColumnBackground), Color.WHITE, HEADER_TEXT_SIZE,
                 MAX_LINES_PER_ROW, Typeface.BOLD);
     }
 
@@ -141,7 +132,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams
                 .MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
         setTextViewAttributes(view, params, ContextCompat.getColor(this,
-                        R.color.frozenColumnBackground), Color.WHITE, HEADER_TEXT_SIZE, MAX_LINES_PER_ROW,
+                R.color.frozenColumnBackground), Color.WHITE, HEADER_TEXT_SIZE, MAX_LINES_PER_ROW,
                 Typeface.BOLD);
     }
 
@@ -150,14 +141,14 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
                 .LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         TextView idView = new TextView(this);
         setTextViewAttributes(idView, layoutParams, ContextCompat.getColor(this,
-                        R.color.frozenColumnBackground), Color.WHITE, NON_HEADER_TEXT_SIZE,
+                R.color.frozenColumnBackground), Color.WHITE, NON_HEADER_TEXT_SIZE,
                 MAX_LINES_PER_ROW, Typeface.NORMAL);
         idView.setText(participant.identifier());
         idView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(RosterActivity.this, ParticipantViewerActivity.class);
-                intent.putExtra("Participant", participant.getIdentifier());
+                intent.putExtra(EXTRA_PARTICIPANT_ID, participant.getIdentifier());
                 startActivityForResult(intent, OLD_PARTICIPANT_REQUEST_CODE);
             }
         });
@@ -170,11 +161,11 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams
                 .MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
 
-        for (int k = 1; k < participant.getQuestions().size(); k++) {
+        for (int k = 1; k < participant.questions().size(); k++) {
             TextView view = new TextView(this);
             setTextViewAttributes(view, params, Color.WHITE, Color.BLACK,
                     NON_HEADER_TEXT_SIZE, MAX_LINES_PER_ROW, Typeface.NORMAL);
-            view.setText(participant.getQuestions().get(k).getResponse());
+            view.setText(participant.questions().get(k).getResponse());
             row.addView(view);
         }
         return row;
@@ -207,8 +198,9 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.add_participant:
-                startActivityForResult(new Intent(this, ParticipantEditorActivity.class),
-                        NEW_PARTICIPANT_REQUEST_CODE);
+                Intent intent = new Intent(this, ParticipantEditorActivity.class);
+                intent.putExtra(EXTRA_CENTER_ID, mCenter.getIdentifier());
+                startActivityForResult(intent, NEW_PARTICIPANT_REQUEST_CODE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -232,8 +224,8 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.i(TAG, "requestCode: " + requestCode);
         if (data != null) {
-            String participantIdentifier = data.getStringExtra("Participant");
-            Participant participant = new Select().from(Center.class).where("Identifier = ?", participantIdentifier).executeSingle();
+            String participantIdentifier = data.getStringExtra(EXTRA_PARTICIPANT_ID);
+            Participant participant = Participant.findByIdentifier(participantIdentifier);
             if (requestCode == NEW_PARTICIPANT_REQUEST_CODE) {
                 mParticipants.add(participant);
                 setParticipantIdView(participant);

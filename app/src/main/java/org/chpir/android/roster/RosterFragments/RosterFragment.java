@@ -9,8 +9,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.chpir.android.roster.Models.Question;
+import org.chpir.android.roster.ParticipantEditorActivity;
 import org.chpir.android.roster.R;
-import org.parceler.Parcels;
 
 public abstract class RosterFragment extends Fragment {
     public final int MINIMUM_WIDTH = 250;
@@ -20,9 +20,11 @@ public abstract class RosterFragment extends Fragment {
             savedInstanceState) {
         View view = inflater.inflate(R.layout.roster_item_fragment, container, false);
         ViewGroup responseComponent = (LinearLayout) view.findViewById(R.id.response_component);
-        mQuestion = Parcels.unwrap(getArguments().getParcelable("Question"));
-
-        createResponseComponent(responseComponent);
+        String questionId = getArguments().getString(ParticipantEditorActivity.EXTRA_QUESTION_ID);
+        if (questionId != null) {
+            mQuestion = Question.findByIdentifier(questionId);
+            createResponseComponent(responseComponent);
+        }
 
         return view;
     }

@@ -1,5 +1,6 @@
 package org.chpir.android.roster.RosterFragments;
 
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -10,7 +11,11 @@ public class SelectOneFragment extends RosterFragment {
     @Override
     protected void createResponseComponent(ViewGroup responseComponent) {
         RadioGroup mRadioGroup = new RadioGroup(getActivity());
-        int previousOptionId = getQuestion().getOptions().indexOfValue(getQuestion().getResponse());
+        Log.i("SELECT ONE", "Type: " + getQuestion().getQuestionType());
+        Integer previousOptionId = null;
+        if (getQuestion().getOptions() != null) {
+             previousOptionId = getQuestion().getOptions().indexOfValue(getQuestion().getResponse());
+        }
 
         for (int i = 0; i < getQuestion().getOptions().size(); i++) {
             int optionId = getQuestion().getOptions().keyAt(i);
@@ -18,7 +23,7 @@ public class SelectOneFragment extends RosterFragment {
             RadioButton radioButton = new RadioButton(getActivity());
             radioButton.setText(option);
             radioButton.setId(optionId);
-            if (previousOptionId == optionId) {
+            if (previousOptionId != null && previousOptionId == optionId) {
                 radioButton.setChecked(true);
             }
             radioButton.setLayoutParams(new RadioGroup.LayoutParams(
