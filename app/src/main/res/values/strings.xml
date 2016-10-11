@@ -7,6 +7,7 @@
     <string name="centers">Centers</string>
     <string name="new_participant">New Participant</string>
     <string name="seeding_dialog_title">Generating Seed Data</string>
-    <string name="seeding_dialog_message">Please Wait!</string>
+    <string name="please_wait_dialog_message">Please Wait!</string>
     <string name="participant_responses_title">Generating Response Shells</string>
+    <string name="loading_participants_title">Loading Participants</string>
 </resources>

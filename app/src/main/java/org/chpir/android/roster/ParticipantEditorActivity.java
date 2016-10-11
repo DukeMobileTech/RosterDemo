@@ -201,7 +201,7 @@ public class ParticipantEditorActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             this.mDialog.setTitle(getString(R.string.participant_responses_title));
-            this.mDialog.setMessage(getString(R.string.seeding_dialog_message));
+            this.mDialog.setMessage(getString(R.string.please_wait_dialog_message));
             this.mDialog.show();
         }
 

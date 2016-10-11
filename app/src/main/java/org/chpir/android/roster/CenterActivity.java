@@ -28,20 +28,7 @@ public class CenterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_center);
         setTitle(getString(R.string.centers));
-        initializeCenters();
-    }
-
-    private void initializeCenters() {
-        List<Center> centers = Center.findAll();
-        if (centers.size() == 0) {
-            new SeedDatabaseTask().execute();
-        } else {
-            CentersAdapter adapter = new CentersAdapter(this, centers);
-            ListView listView = (ListView) findViewById(R.id.center_list);
-            if (listView != null) {
-                listView.setAdapter(adapter);
-            }
-        }
+        new SeedDatabaseTask().execute();
     }
 
     private class CentersAdapter extends ArrayAdapter<Center> {
@@ -82,14 +69,16 @@ public class CenterActivity extends AppCompatActivity {
 
         @Override
         protected List<Center> doInBackground(Void... params) {
-            SeedData.seedDatabase();
+            if (Center.findAll().size() == 0) {
+                SeedData.seedDatabase();
+            }
             return Center.findAll();
         }
 
         @Override
         protected void onPreExecute() {
             this.mDialog.setTitle(getString(R.string.seeding_dialog_title));
-            this.mDialog.setMessage(getString(R.string.seeding_dialog_message));
+            this.mDialog.setMessage(getString(R.string.please_wait_dialog_message));
             this.mDialog.show();
         }
 
