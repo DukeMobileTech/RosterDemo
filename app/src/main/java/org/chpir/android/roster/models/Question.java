@@ -7,20 +7,17 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
+import java.util.List;
 import java.util.UUID;
 
 @Table(name = "Questions")
 public class Question extends Model {
     @Column(name = "Text")
     private String text;
-    @Column(name = "Response")
-    private String response;
     @Column(name = "QuestionType")
     private QuestionType questionType;
     @Column(name = "QuestionHeader")
     private QuestionHeader questionHeader;
-    @Column(name = "Participant")
-    private Participant mParticipant;
     @Column(name = "Identifier")
     private String mIdentifier;
 
@@ -34,21 +31,8 @@ public class Question extends Model {
                 .executeSingle();
     }
 
-    public void setParticipant(Participant participant) {
-        this.mParticipant = participant;
-    }
-
     public String getIdentifier() {
         return mIdentifier;
-    }
-
-    public String getResponse() {
-        return response;
-    }
-
-    public void setResponse(String r) {
-        this.response = r;
-        save(); //TODO change to save response when save button pressed
     }
 
     public String getText() {
@@ -86,6 +70,10 @@ public class Question extends Model {
             options.append(1, "No");
         }
         return options;
+    }
+
+    public static List<Question> findAll() {
+        return new Select().from(Question.class).orderBy("Id ASC").execute();
     }
 
     public enum QuestionType {

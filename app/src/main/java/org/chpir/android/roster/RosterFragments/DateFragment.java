@@ -17,11 +17,11 @@ public class DateFragment extends RosterFragment {
                 new OnDateChangedListener() {
                     @Override
                     public void onDateChanged(DatePicker view, int newYear, int newMonth, int newDay) {
-                        getQuestion().setResponse((newMonth + 1) + "-" + newDay + "-" + newYear);
+                        getResponse().setText((newMonth + 1) + "-" + newDay + "-" + newYear);
                     }
                 });
         responseComponent.addView(datePicker);
-        updateDate(getQuestion().getResponse());
+        updateDate(getResponse().getText());
     }
 
     private void updateDate(String date) {

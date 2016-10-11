@@ -16,6 +16,9 @@ import org.chpir.android.roster.Models.Participant;
 import org.chpir.android.roster.Models.Question;
 import org.chpir.android.roster.RosterFragments.RosterFragment;
 import org.chpir.android.roster.RosterFragments.RosterFragmentGenerator;
+import org.chpir.android.roster.Utils.SeedData;
+
+import java.util.List;
 
 public class ParticipantEditorActivity extends AppCompatActivity {
     public final static String EXTRA_QUESTION_ID = "org.chpir.android.roster.question_id";
@@ -25,6 +28,7 @@ public class ParticipantEditorActivity extends AppCompatActivity {
     private NavigationView navigationView;
     private int currentMenuItem = 0;
     private Participant mParticipant;
+    private List<Question> mQuestions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +47,12 @@ public class ParticipantEditorActivity extends AppCompatActivity {
         if (participantId == null && centerId != null) {
             mParticipant = new Participant();
             mParticipant.setCenter(Center.findByIdentifier(centerId));
-            mParticipant.saveParticipant();
+            mParticipant.save();
+            SeedData.createDefaultResponses(mParticipant);
         } else {
             mParticipant = Participant.findByIdentifier(participantId);
         }
-
+        mQuestions = Question.findAll();
         mDrawer = (DrawerLayout) findViewById(R.id.roster_drawer_layout);
         navigationView = (NavigationView) findViewById(R.id.roster_drawer_view);
         setNavigationViewMenu();
@@ -88,7 +93,8 @@ public class ParticipantEditorActivity extends AppCompatActivity {
         RosterFragment fragment = RosterFragmentGenerator.createQuestionFragment(
                 Question.QuestionHeader.getByIndex(position).getQuestionType());
         Bundle bundle = new Bundle();
-        bundle.putString(EXTRA_QUESTION_ID, mParticipant.questions().get(position).getIdentifier());
+        bundle.putString(EXTRA_QUESTION_ID, mQuestions.get(position).getIdentifier());
+        bundle.putString(EXTRA_PARTICIPANT_ID, mParticipant.getIdentifier());
         fragment.setArguments(bundle);
         switchOutFragment(fragment);
         invalidateOptionsMenu();
@@ -130,7 +136,7 @@ public class ParticipantEditorActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (currentMenuItem == 0) {
             menu.findItem(R.id.menu_item_previous).setVisible(false);
-        } else if (currentMenuItem == mParticipant.questions().size() - 1) {
+        } else if (currentMenuItem == mQuestions.size() - 1) {
             menu.findItem(R.id.menu_item_next).setVisible(false);
         }
         return super.onPrepareOptionsMenu(menu);

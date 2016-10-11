@@ -13,10 +13,10 @@ public class IntegerFragment extends RosterFragment {
         editText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType
                 .TYPE_CLASS_NUMBER);
         editText.setMinimumWidth(MINIMUM_WIDTH);
-        editText.setText(getQuestion().getResponse());
+        editText.setText(getResponse().getText());
         editText.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                getQuestion().setResponse(s.toString());
+                getResponse().setText(s.toString());
             }
 
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

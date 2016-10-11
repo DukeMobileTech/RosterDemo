@@ -25,7 +25,7 @@ import org.chpir.android.roster.Listeners.ScrollViewListener;
 import org.chpir.android.roster.Models.Center;
 import org.chpir.android.roster.Models.Participant;
 import org.chpir.android.roster.Models.Question;
-import org.chpir.android.roster.Utils.SeedData;
+import org.chpir.android.roster.Models.Response;
 
 import java.util.List;
 
@@ -59,8 +59,8 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         if (centerId != null) {
             mCenter = Center.findByIdentifier(centerId);
             setTitle(mCenter.getName());
+            mParticipants = mCenter.participants();
         }
-        initializeParticipants();
         setDimensions();
         setHeaders();
 
@@ -74,14 +74,6 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         displayParticipants();
     }
 
-    private void initializeParticipants() {
-        mParticipants = mCenter.participants();
-        if (mParticipants.size() == 0) {
-            SeedData.createSeedParticipants(mCenter);
-            mParticipants = mCenter.participants();
-        }
-    }
-
     private void setDimensions() {
         final float scale = getResources().getDisplayMetrics().density;
         HEIGHT = (int) (50 * scale + 0.5f);
@@ -90,13 +82,14 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     }
 
     private void setHeaders() {
-        LinearLayout participantIDLayout = (LinearLayout) findViewById(R.id.header_1);
         TextView idHeader = new TextView(this);
         setLinearLayoutHeaderTextViewAttrs(idHeader);
         idHeader.setText(Question.QuestionHeader.PARTICIPANT_ID.toString());
-        participantIDLayout.addView(idHeader);
+        LinearLayout participantIDLayout = (LinearLayout) findViewById(R.id.header_1);
+        if (participantIDLayout != null) {
+            participantIDLayout.addView(idHeader);
+        }
 
-        TableLayout rosterHeaders = (TableLayout) findViewById(R.id.header_2);
         TableRow row = new TableRow(this);
         row.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams
                 .MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
@@ -108,7 +101,10 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
                 row.addView(headerView);
             }
         }
-        rosterHeaders.addView(row);
+        TableLayout rosterHeaders = (TableLayout) findViewById(R.id.header_2);
+        if (rosterHeaders != null) {
+            rosterHeaders.addView(row);
+        }
     }
 
     private void displayParticipants() {
@@ -143,7 +139,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         setTextViewAttributes(idView, layoutParams, ContextCompat.getColor(this,
                 R.color.frozenColumnBackground), Color.WHITE, NON_HEADER_TEXT_SIZE,
                 MAX_LINES_PER_ROW, Typeface.NORMAL);
-        idView.setText(participant.identifier());
+        idView.setText(participant.identifierResponse().getText());
         idView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -161,12 +157,15 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams
                 .MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
 
-        for (int k = 1; k < participant.questions().size(); k++) {
-            TextView view = new TextView(this);
-            setTextViewAttributes(view, params, Color.WHITE, Color.BLACK,
-                    NON_HEADER_TEXT_SIZE, MAX_LINES_PER_ROW, Typeface.NORMAL);
-            view.setText(participant.questions().get(k).getResponse());
-            row.addView(view);
+        for (Question question : Question.findAll()) {
+            if (question.getQuestionHeader() != Question.QuestionHeader.PARTICIPANT_ID) {
+                TextView view = new TextView(this);
+                setTextViewAttributes(view, params, Color.WHITE, Color.BLACK,
+                        NON_HEADER_TEXT_SIZE, MAX_LINES_PER_ROW, Typeface.NORMAL);
+                view.setText(Response.findByQuestionAndParticipant(question, participant)
+                        .getLabel());
+                row.addView(view); // TODO: 10/10/16
+            }
         }
         return row;
     }

@@ -8,21 +8,27 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.chpir.android.roster.Models.Participant;
 import org.chpir.android.roster.Models.Question;
+import org.chpir.android.roster.Models.Response;
 import org.chpir.android.roster.ParticipantEditorActivity;
 import org.chpir.android.roster.R;
 
 public abstract class RosterFragment extends Fragment {
     public final int MINIMUM_WIDTH = 250;
     private Question mQuestion;
+    private Response mResponse;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle
             savedInstanceState) {
         View view = inflater.inflate(R.layout.roster_item_fragment, container, false);
         ViewGroup responseComponent = (LinearLayout) view.findViewById(R.id.response_component);
         String questionId = getArguments().getString(ParticipantEditorActivity.EXTRA_QUESTION_ID);
-        if (questionId != null) {
+        String participantId = getArguments().getString(ParticipantEditorActivity.EXTRA_PARTICIPANT_ID);
+        if (questionId != null && participantId != null) {
             mQuestion = Question.findByIdentifier(questionId);
+            Participant participant = Participant.findByIdentifier(participantId);
+            mResponse = Response.findByQuestionAndParticipant(mQuestion, participant);
             createResponseComponent(responseComponent);
         }
 
@@ -40,5 +46,9 @@ public abstract class RosterFragment extends Fragment {
 
     Question getQuestion() {
         return mQuestion;
+    }
+
+    Response getResponse() {
+        return mResponse;
     }
 }

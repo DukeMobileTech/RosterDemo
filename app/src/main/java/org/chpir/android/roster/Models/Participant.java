@@ -5,8 +5,6 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
-import org.chpir.android.roster.Utils.SeedData;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -27,22 +25,19 @@ public class Participant extends Model {
                 .executeSingle();
     }
 
-    public String identifier() {
-        if (questions().size() == 0 || questions().get(0).getResponse() == null || questions()
-                .get(0).getResponse().isEmpty()) {
-            return mIdentifier;
-        } else {
-            return questions().get(0).getResponse();
-        }
+    public static List<Participant> findAll() {
+        return new Select().from(Participant.class).orderBy("Id ASC").execute();
+    }
+
+    public Response identifierResponse() {
+        return new Select().from(Response.class).where("Participant = ?", this.getId()).where
+                ("Question = ?", new Select().from(Question.class).where("QuestionHeader = ?",
+                        Question.QuestionHeader.PARTICIPANT_ID).executeSingle().getId())
+                .executeSingle();
     }
 
     public List<Question> questions() {
         return new Select().from(Question.class).where("Participant = ?", getId()).execute();
-    }
-
-    public void saveParticipant() {
-        this.save();
-        SeedData.createSeedQuestions(this);
     }
 
     public String getIdentifier() {
@@ -55,5 +50,9 @@ public class Participant extends Model {
 
     public void setCenter(Center center) {
         mCenter = center;
+    }
+
+    public List<Response> responses() {
+        return new Select().from(Response.class).where("Participant = ?", getId()).execute();
     }
 }

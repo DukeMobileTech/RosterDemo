@@ -14,15 +14,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.chpir.android.roster.Models.Participant;
-import org.chpir.android.roster.Models.Question;
+import org.chpir.android.roster.Models.Response;
 
 import java.util.List;
 
 public class ParticipantViewerActivity extends AppCompatActivity {
     public final static String EXTRA_PARTICIPANT_ID = "org.chpir.android.roster.participant_id";
+    private static final String TAG = "ParticipantViewerActivity";
     final private int EDIT_PARTICIPANT_REQUEST_CODE = 100;
     private Participant mParticipant;
     private RecyclerView mRecyclerView;
+    private List<Response> mResponses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,7 @@ public class ParticipantViewerActivity extends AppCompatActivity {
         String participantId = getIntent().getStringExtra(RosterActivity.EXTRA_PARTICIPANT_ID);
         if (participantId != null) {
             mParticipant = Participant.findByIdentifier(participantId);
+            mResponses = mParticipant.responses();
             setTitle(participantId);
         }
     }
@@ -87,19 +90,19 @@ public class ParticipantViewerActivity extends AppCompatActivity {
     }
 
     private void showParticipantDetails() {
-        QuestionAdapter adapter = new QuestionAdapter(mParticipant.questions());
+        ResponseAdapter adapter = new ResponseAdapter(mParticipant.responses());
         if (mRecyclerView != null) {
             mRecyclerView.setAdapter(adapter);
             mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         }
     }
 
-    private class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.QuestionViewHolder> {
+    private class ResponseAdapter extends RecyclerView.Adapter<ResponseAdapter.QuestionViewHolder> {
 
-        List<Question> questions;
+        List<Response> responses;
 
-        QuestionAdapter(List<Question> questions) {
-            this.questions = questions;
+        ResponseAdapter(List<Response> responses) {
+            this.responses = responses;
         }
 
         @Override
@@ -111,13 +114,13 @@ public class ParticipantViewerActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(QuestionViewHolder holder, int position) {
-            holder.questionText.setText(questions.get(position).getText());
-            holder.questionResponse.setText(questions.get(position).getResponse());
+            holder.questionText.setText(responses.get(position).getQuestion().getText());
+            holder.questionResponse.setText(mResponses.get(position).getLabel());
         }
 
         @Override
         public int getItemCount() {
-            return questions.size();
+            return responses.size();
         }
 
         @Override
