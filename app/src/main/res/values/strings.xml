@@ -8,4 +8,5 @@
     <string name="new_participant">New Participant</string>
     <string name="seeding_dialog_title">Generating Seed Data</string>
     <string name="seeding_dialog_message">Please Wait!</string>
+    <string name="participant_responses_title">Generating Response Shells</string>
 </resources>

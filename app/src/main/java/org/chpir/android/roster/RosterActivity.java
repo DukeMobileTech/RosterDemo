@@ -156,16 +156,13 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         TableRow row = new TableRow(this);
         TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams
                 .MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
-
-        for (Question question : Question.findAll()) {
-            if (question.getQuestionHeader() != Question.QuestionHeader.PARTICIPANT_ID) {
-                TextView view = new TextView(this);
-                setTextViewAttributes(view, params, Color.WHITE, Color.BLACK,
-                        NON_HEADER_TEXT_SIZE, MAX_LINES_PER_ROW, Typeface.NORMAL);
-                view.setText(Response.findByQuestionAndParticipant(question, participant)
-                        .getLabel());
-                row.addView(view); // TODO: 10/10/16
-            }
+        List<Response> responses = participant.responses();
+        for (int k = 1; k < Question.findAll().size(); k++) {
+            TextView view = new TextView(this);
+            setTextViewAttributes(view, params, Color.WHITE, Color.BLACK,
+                    NON_HEADER_TEXT_SIZE, MAX_LINES_PER_ROW, Typeface.NORMAL);
+            view.setText(responses.get(k).getLabel());
+            row.addView(view);
         }
         return row;
     }
@@ -230,22 +227,25 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
                 setParticipantIdView(participant);
                 mTableLayout.addView(getParticipantRow(participant));
             } else if (requestCode == OLD_PARTICIPANT_REQUEST_CODE) {
-                // TODO Fix this monstrosity
                 for (int k = 0; k < mParticipants.size(); k++) {
                     if (mParticipants.get(k).getIdentifier().equals(participant.getIdentifier())) {
-                        mParticipants.set(k, participant);
+                        updateParticipantRow(k, participant);
                         break;
                     }
                 }
-                displayParticipants();
             }
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        displayParticipants();
+    private void updateParticipantRow(int index, Participant participant) {
+        TableRow row = (TableRow) mTableLayout.getChildAt(index);
+        List<Response> responses = participant.responses();
+        for (int k = 1; k < responses.size(); k++) {
+            TextView textView = (TextView) row.getVirtualChildAt(k - 1);
+            textView.setText(responses.get(k).getLabel());
+        }
+        TextView textIdView = (TextView) mLinearLayout.getChildAt(index);
+        textIdView.setText(responses.get(0).getLabel());
     }
 
 }

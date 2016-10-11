@@ -35,7 +35,7 @@ public class ParticipantViewerActivity extends AppCompatActivity {
         if (participantId != null) {
             mParticipant = Participant.findByIdentifier(participantId);
             mResponses = mParticipant.responses();
-            setTitle(participantId);
+            setTitle(mParticipant.identifierResponse().getText());
         }
     }
 
@@ -70,6 +70,7 @@ public class ParticipantViewerActivity extends AppCompatActivity {
                     .EXTRA_PARTICIPANT_ID);
             if (participantIdentifier != null) {
                 mParticipant = Participant.findByIdentifier(participantIdentifier);
+                mResponses = mParticipant.responses();
                 showParticipantDetails();
             }
         }
@@ -90,7 +91,7 @@ public class ParticipantViewerActivity extends AppCompatActivity {
     }
 
     private void showParticipantDetails() {
-        ResponseAdapter adapter = new ResponseAdapter(mParticipant.responses());
+        ResponseAdapter adapter = new ResponseAdapter(mResponses);
         if (mRecyclerView != null) {
             mRecyclerView.setAdapter(adapter);
             mRecyclerView.setLayoutManager(new LinearLayoutManager(this));

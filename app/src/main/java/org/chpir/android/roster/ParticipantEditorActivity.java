@@ -1,12 +1,15 @@
 package org.chpir.android.roster;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
@@ -29,6 +32,7 @@ public class ParticipantEditorActivity extends AppCompatActivity {
     private int currentMenuItem = 0;
     private Participant mParticipant;
     private List<Question> mQuestions;
+    private RosterFragment mRosterFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +49,8 @@ public class ParticipantEditorActivity extends AppCompatActivity {
         String participantId = getIntent().getStringExtra(ParticipantViewerActivity
                 .EXTRA_PARTICIPANT_ID);
         if (participantId == null && centerId != null) {
-            mParticipant = new Participant();
-            mParticipant.setCenter(Center.findByIdentifier(centerId));
-            mParticipant.save();
-            SeedData.createDefaultResponses(mParticipant);
+            Log.i(TAG, "Number of questions: " + Question.findAll().size());
+            new NewParticipantTask().execute(centerId);
         } else {
             mParticipant = Participant.findByIdentifier(participantId);
         }
@@ -89,16 +91,18 @@ public class ParticipantEditorActivity extends AppCompatActivity {
     }
 
     private void updateFragment(int position) {
-        currentMenuItem = position;
-        RosterFragment fragment = RosterFragmentGenerator.createQuestionFragment(
-                Question.QuestionHeader.getByIndex(position).getQuestionType());
-        Bundle bundle = new Bundle();
-        bundle.putString(EXTRA_QUESTION_ID, mQuestions.get(position).getIdentifier());
-        bundle.putString(EXTRA_PARTICIPANT_ID, mParticipant.getIdentifier());
-        fragment.setArguments(bundle);
-        switchOutFragment(fragment);
-        invalidateOptionsMenu();
-        checkMenuItem(navigationView.getMenu().getItem(currentMenuItem));
+        if (mParticipant != null) {
+            currentMenuItem = position;
+            mRosterFragment = RosterFragmentGenerator.createQuestionFragment(
+                    Question.QuestionHeader.getByIndex(position).getQuestionType());
+            Bundle bundle = new Bundle();
+            bundle.putString(EXTRA_QUESTION_ID, mQuestions.get(position).getIdentifier());
+            bundle.putString(EXTRA_PARTICIPANT_ID, mParticipant.getIdentifier());
+            mRosterFragment.setArguments(bundle);
+            switchOutFragment(mRosterFragment);
+            invalidateOptionsMenu();
+            checkMenuItem(navigationView.getMenu().getItem(currentMenuItem));
+        }
     }
 
     private void switchOutFragment(RosterFragment fragment) {
@@ -152,9 +156,11 @@ public class ParticipantEditorActivity extends AppCompatActivity {
                 saveParticipant();
                 return true;
             case R.id.menu_item_next:
+                mRosterFragment.getResponse().save();
                 updateFragment(currentMenuItem + 1);
                 return true;
             case R.id.menu_item_previous:
+                mRosterFragment.getResponse().save();
                 updateFragment(currentMenuItem - 1);
                 return true;
             default:
@@ -163,7 +169,7 @@ public class ParticipantEditorActivity extends AppCompatActivity {
     }
 
     private void saveParticipant() {
-        mParticipant.save();
+        mRosterFragment.getResponse().save();
         Class callingClass = RosterActivity.class;
         if (getCallingActivity() != null) {
             callingClass = getCallingActivity().getClass();
@@ -178,6 +184,35 @@ public class ParticipantEditorActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateFragment(currentMenuItem);
+    }
+
+    private class NewParticipantTask extends AsyncTask<String, Void, Participant> {
+        private ProgressDialog mDialog = new ProgressDialog(ParticipantEditorActivity.this);
+
+        @Override
+        protected Participant doInBackground(String... params) {
+            Participant participant = new Participant();
+            participant.setCenter(Center.findByIdentifier(params[0]));
+            participant.save();
+            SeedData.createDefaultResponses(participant);
+            return participant;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            this.mDialog.setTitle(getString(R.string.participant_responses_title));
+            this.mDialog.setMessage(getString(R.string.seeding_dialog_message));
+            this.mDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(Participant result) {
+            if (mDialog.isShowing()) {
+                mDialog.dismiss();
+            }
+            mParticipant = result;
+            updateFragment(0);
+        }
     }
 
 }

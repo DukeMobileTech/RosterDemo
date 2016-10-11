@@ -30,13 +30,7 @@ public final class SeedData {
                     Participant participant = new Participant();
                     participant.setCenter(center);
                     participant.save();
-                    for (Question question : Question.findAll()) {
-                        Response response = new Response();
-                        response.setParticipant(participant);
-                        response.setQuestion(question);
-                        response.setText(generateResponse(response));
-                        response.save();
-                    }
+                    responseFactory(participant);
                 }
             }
             ActiveAndroid.setTransactionSuccessful();
@@ -66,15 +60,20 @@ public final class SeedData {
     public static void createDefaultResponses(Participant participant) {
         ActiveAndroid.beginTransaction();
         try {
-            for (Question question : Question.findAll()) {
-                Response response = new Response();
-                response.setParticipant(participant);
-                response.setQuestion(question);
-                response.save();
-            }
+            responseFactory(participant);
             ActiveAndroid.setTransactionSuccessful();
         } finally {
             ActiveAndroid.endTransaction();
+        }
+    }
+
+    private static void responseFactory(Participant participant) {
+        for (Question question : Question.findAll()) {
+            Response response = new Response();
+            response.setParticipant(participant);
+            response.setQuestion(question);
+            response.setText(generateResponse(response));
+            response.save();
         }
     }
 

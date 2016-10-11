@@ -44,11 +44,11 @@ public abstract class RosterFragment extends Fragment {
         itemText.setText(mQuestion.getText());
     }
 
-    Question getQuestion() {
+    public Question getQuestion() {
         return mQuestion;
     }
 
-    Response getResponse() {
+    public Response getResponse() {
         return mResponse;
     }
 }
