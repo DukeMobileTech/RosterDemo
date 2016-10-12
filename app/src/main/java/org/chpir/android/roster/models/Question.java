@@ -76,6 +76,10 @@ public class Question extends Model {
         return new Select().from(Question.class).orderBy("Id ASC").execute();
     }
 
+    public static int questionCount() {
+        return new Select().from(Question.class).count();
+    }
+
     public enum QuestionType {
         SELECT_ONE, FREE_RESPONSE, DATE, INTEGER;
     }

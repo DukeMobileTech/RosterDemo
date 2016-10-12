@@ -43,4 +43,8 @@ public class Center extends Model {
     public List<Participant> participants() {
         return new Select().from(Participant.class).where("Center = ?", getId()).execute();
     }
+
+    public int participantCount() {
+        return new Select().from(Participant.class).where("Center = ?", getId()).count();
+    }
 }
