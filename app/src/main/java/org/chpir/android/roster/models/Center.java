@@ -1,10 +1,13 @@
 package org.chpir.android.roster.Models;
 
+import android.util.Log;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Table(name = "Centers")
@@ -41,10 +44,25 @@ public class Center extends Model {
     }
 
     public List<Participant> participants() {
-        return new Select().from(Participant.class).where("Center = ?", getId()).execute();
+        List<Participant> res = new ArrayList<>();
+        try{
+            res = new Select().from(Participant.class).where("Center = ?", getId()).execute();
+        }
+        catch(Exception e){
+            Log.e("Empty Database", "There is no data in the participant table");
+        }
+        return res;
     }
 
     public int participantCount() {
-        return new Select().from(Participant.class).where("Center = ?", getId()).count();
+        int res = 0;
+        try{
+             res = new Select().from(Participant.class).where("Center = ?", getId()).count();
+        }
+        catch(Exception e){
+            Log.e("Empty Database", "There is no data in the participant table");
+            res = -1;
+        }
+        return res;
     }
 }

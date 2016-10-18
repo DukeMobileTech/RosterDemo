@@ -35,6 +35,7 @@ import java.util.List;
 public class RosterActivity extends AppCompatActivity implements ScrollViewListener {
     public final static String EXTRA_CENTER_ID = "org.chpir.android.roster.center_id";
     public final static String EXTRA_PARTICIPANT_ID = "org.chpir.android.roster.participant_id";
+    public final static String EXTRA_QUESTION_HEADER = "org.chpir.android.roster.question_header";
     final String TAG = "RosterActivity";
     final private int PADDING = 2;
     final private int MAX_LINES_PER_ROW = 1;
@@ -104,6 +105,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
                 TextView headerView = new TextView(this);
                 headerView.setText(header.toString());
                 setTableRowLayoutHeaderTextViewAttrs(headerView);
+                setFirstRowListner(headerView, header);
                 row.addView(headerView);
             }
         }
@@ -111,6 +113,17 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         if (rosterHeaders != null) {
             rosterHeaders.addView(row);
         }
+    }
+
+    private void setFirstRowListner(TextView headerView, final Question.QuestionHeader header){
+        headerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RosterActivity.this, ResponseViewerActivity.class);
+                intent.putExtra(EXTRA_CENTER_ID, mCenter.getIdentifier());
+                intent.putExtra(EXTRA_QUESTION_HEADER, header);
+            }
+        });
     }
 
     private void drawTableView() {
@@ -210,6 +223,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
             }
         });
     }
+
 
     private void setRowView(Participant participant, int index) {
         TableRow row = (TableRow) mTableLayout.getChildAt(index);

@@ -25,6 +25,11 @@ public class Participant extends Model {
                 .executeSingle();
     }
 
+    public static List<Participant> findByCenter(String centerId) {
+        return new Select().from(Participant.class).where("Center = ?", centerId)
+                .execute();
+    }
+
     public static List<Participant> findAll() {
         return new Select().from(Participant.class).orderBy("Id ASC").execute();
     }
