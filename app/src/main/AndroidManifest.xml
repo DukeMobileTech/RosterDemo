@@ -20,6 +20,8 @@
         </activity>
         <activity android:name=".RosterActivity">
         </activity>
+        <activity android:name=".ResponseViewerActivity">
+        </activity>
         <activity android:name=".ParticipantViewerActivity">
         </activity>
         <meta-data android:name="AA_DB_NAME" android:value="RosterDemo.db" />

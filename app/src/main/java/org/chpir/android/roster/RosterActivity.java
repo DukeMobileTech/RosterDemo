@@ -122,6 +122,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
                 Intent intent = new Intent(RosterActivity.this, ResponseViewerActivity.class);
                 intent.putExtra(EXTRA_CENTER_ID, mCenter.getIdentifier());
                 intent.putExtra(EXTRA_QUESTION_HEADER, header);
+                startActivity(intent);
             }
         });
     }

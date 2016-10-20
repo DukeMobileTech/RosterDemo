@@ -25,7 +25,7 @@ public class Participant extends Model {
                 .executeSingle();
     }
 
-    public static List<Participant> findByCenter(String centerId) {
+    public static List<Participant> findByCenter (String centerId) {
         return new Select().from(Participant.class).where("Center = ?", centerId)
                 .execute();
     }
@@ -38,6 +38,13 @@ public class Participant extends Model {
         return new Select().from(Response.class).where("Participant = ?", this.getId()).where
                 ("Question = ?", new Select().from(Question.class).where("QuestionHeader = ?",
                         Question.QuestionHeader.PARTICIPANT_ID).executeSingle().getId())
+                .executeSingle();
+    }
+
+    public Response findResponseByQuestionHeader(Question.QuestionHeader header) {
+        return new Select().from(Response.class).where("Participant = ?", this.getId()).where
+                ("Question = ?", new Select().from(Question.class).where("QuestionHeader = ?",
+                        header).executeSingle().getId())
                 .executeSingle();
     }
 
