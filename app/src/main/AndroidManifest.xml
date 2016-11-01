@@ -18,6 +18,8 @@
         </activity>
         <activity android:name=".ParticipantEditorActivity">
         </activity>
+        <activity android:name=".ResponseEditorActivity">
+        </activity>
         <activity android:name=".RosterActivity">
         </activity>
         <activity android:name=".ResponseViewerActivity">

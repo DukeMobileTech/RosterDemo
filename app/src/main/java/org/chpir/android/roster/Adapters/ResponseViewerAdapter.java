@@ -1,6 +1,8 @@
 package org.chpir.android.roster.Adapters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +14,18 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import org.chpir.android.roster.Models.Question;
+import org.chpir.android.roster.ParticipantEditorActivity;
+import org.chpir.android.roster.ParticipantViewerActivity;
 import org.chpir.android.roster.R;
+import org.chpir.android.roster.ResponseEditorActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.support.v4.app.ActivityCompat.startActivity;
+import static android.support.v4.app.ActivityCompat.startActivityForResult;
+import static android.support.v4.content.ContextCompat.startActivities;
 
 /**
  * Created by Harry on 10/20/16.
@@ -23,11 +33,13 @@ import java.util.List;
 public class ResponseViewerAdapter extends BaseAdapter implements ListAdapter {
     private List<String> participantIdList;
     private List<String> responseList;
+    private Question.QuestionHeader questionHeader;
     private Context context;
 
-    public ResponseViewerAdapter(List<String> participantIdList, List<String> responseList, Context context) {
+    public ResponseViewerAdapter(List<String> participantIdList, List<String> responseList, Question.QuestionHeader questionHeader, Context context) {
         this.participantIdList = participantIdList;
         this.responseList = responseList;
+        this.questionHeader = questionHeader;
         this.context = context;
     }
 
@@ -64,6 +76,12 @@ public class ResponseViewerAdapter extends BaseAdapter implements ListAdapter {
         editBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Question question = Question.findByHeader(questionHeader);
+                Intent intent = new Intent(context, ResponseEditorActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra(ParticipantEditorActivity.EXTRA_PARTICIPANT_ID, participantIdList.get(position));
+                intent.putExtra(ParticipantEditorActivity.EXTRA_QUESTION_ID, question.getIdentifier());
+                context.startActivity(intent);
                 Log.i("response_viewer", "onClick: Success");
                 notifyDataSetChanged();
             }

@@ -21,7 +21,7 @@ import java.util.List;
 public class ParticipantViewerActivity extends AppCompatActivity {
     public final static String EXTRA_PARTICIPANT_ID = "org.chpir.android.roster.participant_id";
     private static final String TAG = "ParticipantViewerActivity";
-    final private int EDIT_PARTICIPANT_REQUEST_CODE = 100;
+    public final int EDIT_PARTICIPANT_REQUEST_CODE = 100;
     private Participant mParticipant;
     private RecyclerView mRecyclerView;
     private List<Response> mResponses;

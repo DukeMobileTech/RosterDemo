@@ -25,13 +25,15 @@ public class ResponseViewerActivity extends AppCompatActivity {
     private Center mCenter;
     private List<String> mParticipantIds;
     private List<String> mResponses;
+    private Question.QuestionHeader mQuestionHeader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_response_viewer);
         String centerId = getIntent().getStringExtra(RosterActivity.EXTRA_CENTER_ID);
-        Question.QuestionHeader questionHeader = (Question.QuestionHeader)getIntent().getExtras().get(RosterActivity.EXTRA_QUESTION_HEADER);
+        mQuestionHeader = (Question.QuestionHeader)getIntent().getExtras().get(RosterActivity.EXTRA_QUESTION_HEADER);
+        setTitle(mQuestionHeader.toString());
         if (centerId != null) {
             mCenter = Center.findByIdentifier(centerId);
             mParticipants = mCenter.participants();
@@ -40,15 +42,15 @@ public class ResponseViewerActivity extends AppCompatActivity {
         mResponses = new ArrayList<>();
         for(Participant oneParticipant: mParticipants){
             mParticipantIds.add(oneParticipant.getIdentifier());
-            mResponses.add(oneParticipant.findResponseByQuestionHeader(questionHeader).getText());
+            mResponses.add(oneParticipant.findResponseByQuestionHeader(mQuestionHeader).getLabel());
         }
         Log.i(TAG,centerId);
-        Log.i(TAG,questionHeader.toString());
+        Log.i(TAG,mQuestionHeader.toString());
         Log.i(TAG,mCenter.toString());
         Log.i(TAG,mParticipants.toString());
         Log.i(TAG,mParticipantIds.toString());
         Log.i(TAG,mResponses.toString());
-        ResponseViewerAdapter adapter = new ResponseViewerAdapter(mParticipantIds, mResponses, getApplicationContext());
+        ResponseViewerAdapter adapter = new ResponseViewerAdapter(mParticipantIds, mResponses, mQuestionHeader, getApplicationContext());
         Log.i(TAG,""+adapter.getCount());
         ListView lView = (ListView) findViewById(R.id.responseListView);
         lView.setAdapter(adapter);

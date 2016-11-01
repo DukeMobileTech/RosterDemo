@@ -31,6 +31,10 @@ public class Question extends Model {
                 .executeSingle();
     }
 
+    public static Question findByHeader(Question.QuestionHeader header){
+        return new Select().from(Question.class).where("QuestionHeader = ?", header).executeSingle();
+    }
+
     public String getIdentifier() {
         return mIdentifier;
     }
