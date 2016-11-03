@@ -14,11 +14,13 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import org.chpir.android.roster.Models.Participant;
 import org.chpir.android.roster.Models.Question;
 import org.chpir.android.roster.ParticipantEditorActivity;
 import org.chpir.android.roster.ParticipantViewerActivity;
 import org.chpir.android.roster.R;
 import org.chpir.android.roster.ResponseEditorActivity;
+import org.chpir.android.roster.RosterActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +35,12 @@ import static android.support.v4.content.ContextCompat.startActivities;
 public class ResponseViewerAdapter extends BaseAdapter implements ListAdapter {
     private List<String> participantIdList;
     private List<String> responseList;
+    private String centerId;
     private Question.QuestionHeader questionHeader;
     private Context context;
 
-    public ResponseViewerAdapter(List<String> participantIdList, List<String> responseList, Question.QuestionHeader questionHeader, Context context) {
+    public ResponseViewerAdapter(String centerId, List<String> participantIdList, List<String> responseList, Question.QuestionHeader questionHeader, Context context) {
+        this.centerId = centerId;
         this.participantIdList = participantIdList;
         this.responseList = responseList;
         this.questionHeader = questionHeader;
@@ -66,7 +70,7 @@ public class ResponseViewerAdapter extends BaseAdapter implements ListAdapter {
         }
 
         TextView participantIdView = (TextView)view.findViewById(R.id.participant_id);
-        participantIdView.setText(participantIdList.get(position));
+        participantIdView.setText(Participant.findByIdentifier(participantIdList.get(position)).findResponseByQuestionHeader(Question.QuestionHeader.PARTICIPANT_ID).getLabel());
 
         TextView responseView = (TextView)view.findViewById(R.id.response);
         responseView.setText(responseList.get(position));
@@ -79,6 +83,7 @@ public class ResponseViewerAdapter extends BaseAdapter implements ListAdapter {
                 Question question = Question.findByHeader(questionHeader);
                 Intent intent = new Intent(context, ResponseEditorActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra(RosterActivity.EXTRA_CENTER_ID, centerId);
                 intent.putExtra(ParticipantEditorActivity.EXTRA_PARTICIPANT_ID, participantIdList.get(position));
                 intent.putExtra(ParticipantEditorActivity.EXTRA_QUESTION_ID, question.getIdentifier());
                 context.startActivity(intent);

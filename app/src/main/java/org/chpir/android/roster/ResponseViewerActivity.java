@@ -1,5 +1,6 @@
 package org.chpir.android.roster;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -44,16 +45,17 @@ public class ResponseViewerActivity extends AppCompatActivity {
             mParticipantIds.add(oneParticipant.getIdentifier());
             mResponses.add(oneParticipant.findResponseByQuestionHeader(mQuestionHeader).getLabel());
         }
-        Log.i(TAG,centerId);
-        Log.i(TAG,mQuestionHeader.toString());
-        Log.i(TAG,mCenter.toString());
-        Log.i(TAG,mParticipants.toString());
-        Log.i(TAG,mParticipantIds.toString());
-        Log.i(TAG,mResponses.toString());
-        ResponseViewerAdapter adapter = new ResponseViewerAdapter(mParticipantIds, mResponses, mQuestionHeader, getApplicationContext());
-        Log.i(TAG,""+adapter.getCount());
+        ResponseViewerAdapter adapter = new ResponseViewerAdapter(centerId ,mParticipantIds, mResponses, mQuestionHeader, getApplicationContext());
         ListView lView = (ListView) findViewById(R.id.responseListView);
         lView.setAdapter(adapter);
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, RosterActivity.class);
+        intent.putExtra(RosterActivity.EXTRA_CENTER_ID, mCenter.getIdentifier());
+        //setResult(200, intent);
+        startActivity(intent);
+        finish();
+    }
 }

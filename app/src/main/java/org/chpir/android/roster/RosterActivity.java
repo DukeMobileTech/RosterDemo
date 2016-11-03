@@ -29,6 +29,7 @@ import org.chpir.android.roster.Models.Participant;
 import org.chpir.android.roster.Models.Question;
 import org.chpir.android.roster.Models.Response;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     public final static String EXTRA_QUESTION_HEADER = "org.chpir.android.roster.question_header";
     final String TAG = "RosterActivity";
     final private int PADDING = 2;
-    final private int MAX_LINES_PER_ROW = 1;
+    final private int MAX_LINES_PER_ROW = 5;
     final private int HEADER_TEXT_SIZE = 18;
     final private int NON_HEADER_TEXT_SIZE = 15;
     final private int NEW_PARTICIPANT_REQUEST_CODE = 100;
@@ -46,6 +47,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     private int HEIGHT;
     private int WIDTH;
     private int MARGIN;
+    private List<Integer> colWidthList;
     private OHScrollView headerScrollView;
     private OHScrollView contentScrollView;
     private boolean interceptScroll = true;
@@ -90,21 +92,23 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
 
     private void setHeaders() {
         TextView idHeader = new TextView(this);
-        setLinearLayoutHeaderTextViewAttrs(idHeader);
+        setLinearLayoutHeaderTextViewAttrs(idHeader,WIDTH);
         idHeader.setText(Question.QuestionHeader.PARTICIPANT_ID.toString());
         LinearLayout participantIDLayout = (LinearLayout) findViewById(R.id.header_1);
         if (participantIDLayout != null) {
             participantIDLayout.addView(idHeader);
         }
-
+        colWidthList = new ArrayList<>();
         TableRow row = new TableRow(this);
         row.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams
                 .MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
         for (Question.QuestionHeader header : Question.QuestionHeader.values()) {
             if (header != Question.QuestionHeader.PARTICIPANT_ID) {
+                int colWidth = header.toString().length()*(HEADER_TEXT_SIZE-2)+5;
+                colWidthList.add(colWidth);
                 TextView headerView = new TextView(this);
                 headerView.setText(header.toString());
-                setTableRowLayoutHeaderTextViewAttrs(headerView);
+                setTableRowLayoutHeaderTextViewAttrs(headerView,colWidth);
                 setFirstRowListner(headerView, header);
                 row.addView(headerView);
             }
@@ -132,21 +136,21 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         drawRowViews();
     }
 
-    private void setLinearLayoutHeaderTextViewAttrs(TextView view) {
+    private void setLinearLayoutHeaderTextViewAttrs(TextView view, int colWidth) {
         setTextViewAttributes(view, getLinearLayoutParams(), ContextCompat.getColor(this,
-                R.color.frozenColumnBackground), Color.WHITE, HEADER_TEXT_SIZE,
+                R.color.frozenColumnBackground), Color.WHITE, HEADER_TEXT_SIZE,colWidth,
                 MAX_LINES_PER_ROW, Typeface.BOLD);
     }
 
-    private void setTableRowLayoutHeaderTextViewAttrs(TextView view) {
+    private void setTableRowLayoutHeaderTextViewAttrs(TextView view, int colWidth) {
         setTextViewAttributes(view, getTableRowLayoutParams(), ContextCompat.getColor(this,
-                R.color.frozenColumnBackground), Color.WHITE, HEADER_TEXT_SIZE, MAX_LINES_PER_ROW,
+                R.color.frozenColumnBackground), Color.WHITE, HEADER_TEXT_SIZE, colWidth,MAX_LINES_PER_ROW,
                 Typeface.BOLD);
     }
 
     private void drawFirstColumnViews() {
         for (int j = 0; j < numParticipants; j++) {
-            addTextViewToLinearLayout();
+            addTextViewToLinearLayout(WIDTH);
         }
     }
 
@@ -157,10 +161,10 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     }
 
     private void setTextViewAttributes(TextView view, ViewGroup.MarginLayoutParams params, int
-            backgroundColor, int textColor, int textSize, int numLines, int typeface) {
+            backgroundColor, int textColor, int textSize, int colWidth, int numLines, int typeface) {
         params.setMargins(MARGIN, MARGIN, MARGIN, MARGIN);
         view.setHeight(HEIGHT);
-        view.setWidth(WIDTH);
+        view.setWidth(colWidth);
         view.setTextColor(textColor);
         view.setGravity(Gravity.CENTER);
         view.setPadding(PADDING, PADDING, PADDING, PADDING);
@@ -184,10 +188,10 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
                 TableRow.LayoutParams.WRAP_CONTENT);
     }
 
-    private void addTextViewToLinearLayout() {
+    private void addTextViewToLinearLayout(int colWidth) {
         TextView idView = new TextView(this);
         setTextViewAttributes(idView, getLinearLayoutParams(), ContextCompat.getColor(this,
-                R.color.frozenColumnBackground), Color.WHITE, NON_HEADER_TEXT_SIZE,
+                R.color.frozenColumnBackground), Color.WHITE, NON_HEADER_TEXT_SIZE, colWidth,
                 MAX_LINES_PER_ROW, Typeface.NORMAL);
         mLinearLayout.addView(idView);
     }
@@ -197,7 +201,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         for (int k = 1; k < numQuestions; k++) {
             TextView view = new TextView(this);
             setTextViewAttributes(view, getTableRowLayoutParams(), Color.WHITE, Color.BLACK,
-                    NON_HEADER_TEXT_SIZE, MAX_LINES_PER_ROW, Typeface.NORMAL);
+                    NON_HEADER_TEXT_SIZE, colWidthList.get(k-1),MAX_LINES_PER_ROW, Typeface.NORMAL);
             row.addView(view);
         }
         mTableLayout.addView(row);
@@ -292,7 +296,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     }
 
     private void addNewView(Participant participant, int index) {
-        addTextViewToLinearLayout();
+        addTextViewToLinearLayout(WIDTH);
         addTableRowToTableLayout();
         setFirstColumnView(participant, index);
         setRowView(participant, index);
