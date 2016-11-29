@@ -10,6 +10,10 @@ import org.chpir.android.roster.Models.Response;
 import java.util.Random;
 
 public final class SeedData {
+    private static final String IPSUM = "Now that there is the Tec-9, a crappy spray gun from " +
+            "South Miami. This gun is advertised as the most popular gun in American crime. Do " +
+            "you believe that shit? It actually says that in the little book that comes with it: " +
+            "the most popular gun in American crime. Like they're actually proud of that shit.";
 
     public static void seedDatabase() {
 
@@ -44,7 +48,12 @@ public final class SeedData {
         Question.QuestionType type = response.getQuestion().getQuestionType();
         switch (type) {
             case FREE_RESPONSE:
-                return response.getQuestion().getText() + " " + new Random().nextInt(100);
+                if (new Random().nextBoolean()) {
+                    return response.getQuestion().getText() + " " + IPSUM.substring(
+                            new Random().nextInt(IPSUM.length() - 1));
+                } else {
+                    return response.getQuestion().getText();
+                }
             case DATE:
                 return new Random().nextInt(12) + "-" + new Random().nextInt(31) + "-" +
                         (new Random().nextInt(2016 - 1980) + 1980);

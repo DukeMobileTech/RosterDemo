@@ -6,17 +6,14 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -30,6 +27,7 @@ import org.chpir.android.roster.Models.Question;
 import org.chpir.android.roster.Models.Response;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -37,23 +35,19 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     public final static String EXTRA_CENTER_ID = "org.chpir.android.roster.center_id";
     public final static String EXTRA_PARTICIPANT_ID = "org.chpir.android.roster.participant_id";
     public final static String EXTRA_QUESTION_HEADER = "org.chpir.android.roster.question_header";
-    final String TAG = "RosterActivity";
-    final private int PADDING = 2;
-    final private int MAX_LINES_PER_ROW = 5;
-    final private int HEADER_TEXT_SIZE = 18;
+    final private String TAG = "RosterActivity";
+    final private int HEADER_TEXT_SIZE = 15;
     final private int NON_HEADER_TEXT_SIZE = 15;
     final private int NEW_PARTICIPANT_REQUEST_CODE = 100;
     final private int OLD_PARTICIPANT_REQUEST_CODE = 200;
-    private int HEIGHT;
-    private int WIDTH;
-    private int MARGIN;
-    private List<Integer> colWidthList;
+    final private int DEFAULT_WIDTH = Question.QuestionHeader.PARTICIPANT_ID.toString().length();
+    private boolean interceptScroll = true;
     private OHScrollView headerScrollView;
     private OHScrollView contentScrollView;
-    private boolean interceptScroll = true;
-    private TableLayout mTableLayout;
-    private LinearLayout mLinearLayout;
+    private TableLayout dataLayout;
+    private TableLayout identifierLayout;
     private Center mCenter;
+    private List<Integer> colWidthList;
     private LinkedHashMap<Participant, List<Response>> mParticipantResponses;
     private int numParticipants;
     private int numQuestions;
@@ -72,27 +66,19 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
             new ParticipantsLoaderTask().execute();
         }
 
-        mTableLayout = (TableLayout) findViewById(R.id.content_table);
-        mLinearLayout = (LinearLayout) findViewById(R.id.participant_id);
+        dataLayout = (TableLayout) findViewById(R.id.content_table);
+        identifierLayout = (TableLayout) findViewById(R.id.participant_id);
         headerScrollView = (OHScrollView) findViewById(R.id.header_scroll);
         contentScrollView = (OHScrollView) findViewById(R.id.content_scroll);
         headerScrollView.setScrollViewListener(this);
         contentScrollView.setScrollViewListener(this);
-        setDimensions();
         setHeaders();
         drawTableView();
     }
 
-    private void setDimensions() {
-        final float scale = getResources().getDisplayMetrics().density;
-        HEIGHT = (int) (50 * scale + 0.5f);
-        WIDTH = (int) (150 * scale + 0.5f);
-        MARGIN = (int) (0.5 * scale + 0.5f);
-    }
-
     private void setHeaders() {
         TextView idHeader = new TextView(this);
-        setLinearLayoutHeaderTextViewAttrs(idHeader,WIDTH);
+        setLinearLayoutHeaderTextViewAttrs(idHeader, DEFAULT_WIDTH);
         idHeader.setText(Question.QuestionHeader.PARTICIPANT_ID.toString());
         LinearLayout participantIDLayout = (LinearLayout) findViewById(R.id.header_1);
         if (participantIDLayout != null) {
@@ -104,12 +90,12 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
                 .MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
         for (Question.QuestionHeader header : Question.QuestionHeader.values()) {
             if (header != Question.QuestionHeader.PARTICIPANT_ID) {
-                int colWidth = header.toString().length()*(HEADER_TEXT_SIZE-2)+5;
+                int colWidth = header.toString().length();
                 colWidthList.add(colWidth);
                 TextView headerView = new TextView(this);
                 headerView.setText(header.toString());
-                setTableRowLayoutHeaderTextViewAttrs(headerView,colWidth);
-                setFirstRowListner(headerView, header);
+                setTableRowLayoutHeaderTextViewAttrs(headerView, colWidth);
+                setFirstRowListener(headerView, header);
                 row.addView(headerView);
             }
         }
@@ -119,7 +105,22 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         }
     }
 
-    private void setFirstRowListner(TextView headerView, final Question.QuestionHeader header){
+    private void drawTableView() {
+        drawFirstColumnViews();
+        drawRowViews();
+    }
+
+    private void setLinearLayoutHeaderTextViewAttrs(TextView view, int colWidth) {
+        setTextViewAttributes(view, ContextCompat.getColor(this, R.color.frozenColumnBackground),
+                Color.WHITE, HEADER_TEXT_SIZE, colWidth, Typeface.BOLD);
+    }
+
+    private void setTableRowLayoutHeaderTextViewAttrs(TextView view, int colWidth) {
+        setTextViewAttributes(view, ContextCompat.getColor(this, R.color.frozenColumnBackground),
+                Color.WHITE, HEADER_TEXT_SIZE, colWidth, Typeface.BOLD);
+    }
+
+    private void setFirstRowListener(TextView headerView, final Question.QuestionHeader header) {
         headerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -131,26 +132,9 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         });
     }
 
-    private void drawTableView() {
-        drawFirstColumnViews();
-        drawRowViews();
-    }
-
-    private void setLinearLayoutHeaderTextViewAttrs(TextView view, int colWidth) {
-        setTextViewAttributes(view, getLinearLayoutParams(), ContextCompat.getColor(this,
-                R.color.frozenColumnBackground), Color.WHITE, HEADER_TEXT_SIZE,colWidth,
-                MAX_LINES_PER_ROW, Typeface.BOLD);
-    }
-
-    private void setTableRowLayoutHeaderTextViewAttrs(TextView view, int colWidth) {
-        setTextViewAttributes(view, getTableRowLayoutParams(), ContextCompat.getColor(this,
-                R.color.frozenColumnBackground), Color.WHITE, HEADER_TEXT_SIZE, colWidth,MAX_LINES_PER_ROW,
-                Typeface.BOLD);
-    }
-
     private void drawFirstColumnViews() {
         for (int j = 0; j < numParticipants; j++) {
-            addTextViewToLinearLayout(WIDTH);
+            addTextViewToLinearLayout(DEFAULT_WIDTH);
         }
     }
 
@@ -160,51 +144,47 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         }
     }
 
-    private void setTextViewAttributes(TextView view, ViewGroup.MarginLayoutParams params, int
-            backgroundColor, int textColor, int textSize, int colWidth, int numLines, int typeface) {
-        params.setMargins(MARGIN, MARGIN, MARGIN, MARGIN);
-        view.setHeight(HEIGHT);
-        view.setWidth(colWidth);
+    private void setTextViewAttributes(TextView view, int backgroundColor, int textColor,
+                                       int textSize, int colWidth, int typeface) {
+        int minimumHeight = 50;
+        int margin = 1;
+        int padding = 5;
+        int maxLinesPerRow = 5;
+
+        view.setMinimumHeight(minimumHeight);
+        view.setEms(colWidth);
         view.setTextColor(textColor);
-        view.setGravity(Gravity.CENTER);
-        view.setPadding(PADDING, PADDING, PADDING, PADDING);
+        view.setGravity(Gravity.CENTER_HORIZONTAL);
+        view.setPadding(padding, padding, padding, padding);
         view.setTypeface(view.getTypeface(), typeface);
         view.setTextSize(textSize);
-        view.setMaxLines(numLines);
+        view.setMaxLines(maxLinesPerRow);
         view.setBackgroundColor(backgroundColor);
         view.setEllipsize(TextUtils.TruncateAt.END);
+        TableRow.LayoutParams params = new TableRow.LayoutParams(
+                TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        params.setMargins(margin, margin, margin, margin);
         view.setLayoutParams(params);
     }
 
-    @NonNull
-    private LinearLayout.LayoutParams getLinearLayoutParams() {
-        return new LinearLayout.LayoutParams(LinearLayout
-                .LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-    }
-
-    @NonNull
-    private TableRow.LayoutParams getTableRowLayoutParams() {
-        return new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
-                TableRow.LayoutParams.WRAP_CONTENT);
-    }
-
     private void addTextViewToLinearLayout(int colWidth) {
+        TableRow row = new TableRow(this);
         TextView idView = new TextView(this);
-        setTextViewAttributes(idView, getLinearLayoutParams(), ContextCompat.getColor(this,
-                R.color.frozenColumnBackground), Color.WHITE, NON_HEADER_TEXT_SIZE, colWidth,
-                MAX_LINES_PER_ROW, Typeface.NORMAL);
-        mLinearLayout.addView(idView);
+        setTextViewAttributes(idView, ContextCompat.getColor(this, R.color.frozenColumnBackground),
+                Color.WHITE, NON_HEADER_TEXT_SIZE, colWidth, Typeface.NORMAL);
+        row.addView(idView);
+        identifierLayout.addView(row);
     }
 
     private void addTableRowToTableLayout() {
         TableRow row = new TableRow(this);
         for (int k = 1; k < numQuestions; k++) {
             TextView view = new TextView(this);
-            setTextViewAttributes(view, getTableRowLayoutParams(), Color.WHITE, Color.BLACK,
-                    NON_HEADER_TEXT_SIZE, colWidthList.get(k-1),MAX_LINES_PER_ROW, Typeface.NORMAL);
+            setTextViewAttributes(view, Color.WHITE, Color.BLACK,
+                    NON_HEADER_TEXT_SIZE, colWidthList.get(k - 1), Typeface.NORMAL);
             row.addView(view);
         }
-        mTableLayout.addView(row);
+        dataLayout.addView(row);
     }
 
     private void displayData() {
@@ -217,7 +197,8 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     }
 
     private void setFirstColumnView(final Participant participant, int index) {
-        TextView textView = (TextView) mLinearLayout.getChildAt(index);
+        TableRow row = (TableRow) identifierLayout.getChildAt(index);
+        TextView textView = (TextView) row.getVirtualChildAt(0);
         textView.setText(mParticipantResponses.get(participant).get(0).getLabel());
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -229,13 +210,24 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         });
     }
 
-
     private void setRowView(Participant participant, int index) {
-        TableRow row = (TableRow) mTableLayout.getChildAt(index);
+        TableRow row = (TableRow) dataLayout.getChildAt(index);
         List<Response> responses = mParticipantResponses.get(participant);
+        List<Integer> lines = new ArrayList<>();
+        List<TextView> views = new ArrayList<>();
+        TableRow idRow = (TableRow) identifierLayout.getChildAt(index);
+        TextView idView = (TextView) idRow.getVirtualChildAt(0);
+        lines.add(idView.getLineCount());
+        views.add(idView);
         for (int k = 1; k < responses.size(); k++) {
             TextView textView = (TextView) row.getVirtualChildAt(k - 1);
             textView.setText(responses.get(k).getLabel());
+            lines.add(textView.getLineCount());
+            views.add(textView);
+        }
+        int max = Collections.max(lines);
+        for (TextView view : views) {
+            view.setLines(max);
         }
     }
 
@@ -274,7 +266,6 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i(TAG, "requestCode: " + requestCode);
         if (data != null) {
             String participantIdentifier = data.getStringExtra(EXTRA_PARTICIPANT_ID);
             Participant participant = Participant.findByIdentifier(participantIdentifier);
@@ -296,21 +287,22 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     }
 
     private void addNewView(Participant participant, int index) {
-        addTextViewToLinearLayout(WIDTH);
+        addTextViewToLinearLayout(DEFAULT_WIDTH);
         addTableRowToTableLayout();
         setFirstColumnView(participant, index);
         setRowView(participant, index);
     }
 
     private void updateParticipantRow(int index, Participant participant) {
-        TableRow row = (TableRow) mTableLayout.getChildAt(index);
+        TableRow row = (TableRow) dataLayout.getChildAt(index);
         List<Response> responses = participant.responses();
         mParticipantResponses.put(participant, responses);
         for (int k = 1; k < responses.size(); k++) {
             TextView textView = (TextView) row.getVirtualChildAt(k - 1);
             textView.setText(responses.get(k).getLabel());
         }
-        TextView textIdView = (TextView) mLinearLayout.getChildAt(index);
+        TableRow idRow = (TableRow) identifierLayout.getChildAt(index);
+        TextView textIdView = (TextView) idRow.getVirtualChildAt(0);
         textIdView.setText(responses.get(0).getLabel());
     }
 

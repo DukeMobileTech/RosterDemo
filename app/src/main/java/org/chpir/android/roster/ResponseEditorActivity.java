@@ -1,27 +1,17 @@
 package org.chpir.android.roster;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 
-import org.chpir.android.roster.Adapters.ResponseViewerAdapter;
-import org.chpir.android.roster.Models.Participant;
 import org.chpir.android.roster.Models.Question;
 import org.chpir.android.roster.RosterFragments.RosterFragment;
 import org.chpir.android.roster.RosterFragments.RosterFragmentGenerator;
 
-import java.util.List;
-
-/**
- * Created by Harry on 11/1/16.
- */
 public class ResponseEditorActivity extends AppCompatActivity {
     private String mQuestionId;
     private String mCenterId;
@@ -38,7 +28,8 @@ public class ResponseEditorActivity extends AppCompatActivity {
         }
         mCenterId = getIntent().getStringExtra(RosterActivity.EXTRA_CENTER_ID);
         mQuestionId = getIntent().getStringExtra(ParticipantEditorActivity.EXTRA_QUESTION_ID);
-        String participantId = getIntent().getStringExtra(ParticipantEditorActivity.EXTRA_PARTICIPANT_ID);
+        String participantId = getIntent().getStringExtra(ParticipantEditorActivity
+                .EXTRA_PARTICIPANT_ID);
 
         mRosterFragment = RosterFragmentGenerator.createQuestionFragment(
                 Question.findByIdentifier(mQuestionId).getQuestionType());
@@ -47,6 +38,15 @@ public class ResponseEditorActivity extends AppCompatActivity {
         bundle.putString(ParticipantEditorActivity.EXTRA_PARTICIPANT_ID, participantId);
         mRosterFragment.setArguments(bundle);
         switchOutFragment(mRosterFragment);
+    }
+
+    private void switchOutFragment(RosterFragment fragment) {
+        FragmentManager manager = getSupportFragmentManager();
+        if (manager.findFragmentById(R.id.roster_item_container) == null) {
+            manager.beginTransaction().add(R.id.roster_item_container, fragment).commit();
+        } else {
+            manager.beginTransaction().replace(R.id.roster_item_container, fragment).commit();
+        }
     }
 
     @Override
@@ -75,18 +75,9 @@ public class ResponseEditorActivity extends AppCompatActivity {
         }
         Intent intent = new Intent(ResponseEditorActivity.this, callingClass);
         intent.putExtra(RosterActivity.EXTRA_CENTER_ID, mCenterId);
-        intent.putExtra(RosterActivity.EXTRA_QUESTION_HEADER, Question.findByIdentifier(mQuestionId).getQuestionHeader());
+        intent.putExtra(RosterActivity.EXTRA_QUESTION_HEADER, Question.findByIdentifier
+                (mQuestionId).getQuestionHeader());
         startActivity(intent);
-        //setResult(100, intent);
         finish();
-    }
-
-    private void switchOutFragment(RosterFragment fragment) {
-        FragmentManager manager = getSupportFragmentManager();
-        if (manager.findFragmentById(R.id.roster_item_container) == null) {
-            manager.beginTransaction().add(R.id.roster_item_container, fragment).commit();
-        } else {
-            manager.beginTransaction().replace(R.id.roster_item_container, fragment).commit();
-        }
     }
 }

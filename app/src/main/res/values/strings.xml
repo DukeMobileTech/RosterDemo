@@ -10,4 +10,5 @@
     <string name="please_wait_dialog_message">Please Wait!</string>
     <string name="participant_responses_title">Generating Response Shells</string>
     <string name="loading_participants_title">Loading Participants</string>
+    <string name="participant_id_response">participant id response</string>
 </resources>

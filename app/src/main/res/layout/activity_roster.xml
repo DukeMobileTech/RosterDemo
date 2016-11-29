@@ -51,21 +51,20 @@
             android:layout_height="wrap_content"
             android:baselineAligned="false">
 
-            <LinearLayout
+            <TableLayout
                 android:id="@+id/participant_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="2dp"
                 android:layout_marginLeft="2dp"
-                android:background="@android:color/black"
-                android:orientation="vertical">
+                android:background="@android:color/black">
 
-            </LinearLayout>
+            </TableLayout>
 
             <org.chpir.android.roster.CustomViews.OHScrollView
                 android:id="@+id/content_scroll"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
                 <TableLayout
                     android:id="@+id/content_table"
